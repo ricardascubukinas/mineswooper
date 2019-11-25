@@ -33,6 +33,7 @@ int randomInt(int low, int high);
 Board *loadSave(char *fileName);
 bool checkForKey(int press, int key);
 bool inBounds(int coordX, int coordY, int sizeX, int sizeY);
+int countNearbyMines(Board tempBoard, int x, int y);
 
 int main()
 {
@@ -56,14 +57,14 @@ void menuInstance()
     {
         gameInstance(realBoard);
     }
-    if (choice == 1)
+    else if (choice == 1)
     {
         //showMenu("Loading the save", fileNames, n, "Choose a save-file to load");
         //*realBoard = loadSave(fileName);
 
         return;
     }
-    if (choice == 2)
+    else if (choice == 2)
     {
         showScoreboard();
         char *menuScoreboard[1] = {"Go back"};
@@ -72,7 +73,7 @@ void menuInstance()
 
         return;
     }
-    if (choice == 3)
+    else
     {
 
         return;
@@ -99,6 +100,16 @@ void setUpBoard(Board *realBoard, int height, int width, int mines)
     realBoard->sizeY = height;
     realBoard->cursorX = realBoard->sizeX / 2;
     realBoard->cursorY = realBoard->sizeY / 2;
+    for (int i = 0; i < realBoard->sizeY; i++)
+    {
+        for (int j = 0; i < realBoard->sizeX; j++)
+        {
+            realBoard->cells[i][j].isMined = false;
+            realBoard->cells[i][j].isRevealed = false;
+            realBoard->cells[i][j].isMarked = false;
+        }
+    }
+
     for (int i = 0; i < mines; i++)
     {
         int x = randomInt(0, realBoard->sizeY), y = randomInt(0, realBoard->sizeX);
@@ -109,12 +120,19 @@ void setUpBoard(Board *realBoard, int height, int width, int mines)
         else
         {
             realBoard->cells[x][y].isMined = true;
-            realBoard->cells[x][y].isMarked = false;
-            realBoard->cells[x][y].isRevealed = false;
             realBoard->cells[x][y].cellValue = -1;
         }
     }
 
+    for (int i = 0; i < realBoard->sizeY; i++)
+    {
+        for (int j = 0; i < realBoard->sizeX; j++)
+        {
+            if (!realBoard->cells[i][j].isMined)
+            {
+            }
+        }
+    }
     return;
 }
 
@@ -227,5 +245,42 @@ bool inBounds(int coordX, int coordY, int sizeX, int sizeY)
     else
     {
         return true;
+    }
+}
+
+int countNearbyMines(Board tempBoard, int x, int y)
+{
+    int cellValue = 0;
+    if (inBounds(x - 1, y - 1, tempBoard.sizeX, tempBoard.sizeY) && tempBoard.cells[x - 1][y - 1].isMined)
+    {
+        cellValue++;
+    }
+    if (inBounds(x, y - 1, tempBoard.sizeX, tempBoard.sizeY) && tempBoard.cells[x][y - 1].isMined)
+    {
+        cellValue++;
+    }
+    if (inBounds(x + 1, y - 1, tempBoard.sizeX, tempBoard.sizeY) && tempBoard.cells[x + 1][y - 1].isMined)
+    {
+        cellValue++;
+    }
+    if (inBounds(x + 1, y, tempBoard.sizeX, tempBoard.sizeY) && tempBoard.cells[x + 1][y].isMined)
+    {
+        cellValue++;
+    }
+    if (inBounds(x + 1, y + 1, tempBoard.sizeX, tempBoard.sizeY) && tempBoard.cells[x + 1][y + 1].isMined)
+    {
+        cellValue++;
+    }
+    if (inBounds(x, y + 1, tempBoard.sizeX, tempBoard.sizeY) && tempBoard.cells[x][y + 1].isMined)
+    {
+        cellValue++;
+    }
+    if (inBounds(x - 1, y + 1, tempBoard.sizeX, tempBoard.sizeY) && tempBoard.cells[x - 1][y + 1].isMined)
+    {
+        cellValue++;
+    }
+    if (inBounds(x - 1, y, tempBoard.sizeX, tempBoard.sizeY) && tempBoard.cells[x - 1][y].isMined)
+    {
+        cellValue++;
     }
 }
