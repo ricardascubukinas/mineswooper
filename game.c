@@ -130,6 +130,7 @@ void setUpBoard(Board *realBoard, int height, int width, int mines)
         {
             if (!realBoard->cells[i][j].isMined)
             {
+                realBoard->cells[i][j].cellValue = countNearbyMines(*realBoard, i, j);
             }
         }
     }
@@ -238,7 +239,7 @@ bool checkForKey(int press, int key)
 
 bool inBounds(int coordX, int coordY, int sizeX, int sizeY)
 {
-    if (coordX < 0 || coordX >= sizeX || coordY < 0 || coordY >= sizeY)
+    if (coordX < 0 || coordX >= sizeY || coordY < 0 || coordY >= sizeX)
     {
         return false;
     }
@@ -248,38 +249,38 @@ bool inBounds(int coordX, int coordY, int sizeX, int sizeY)
     }
 }
 
-int countNearbyMines(Board tempBoard, int x, int y)
+int countNearbyMines(Board tempBoard, int coordX, int coordY)
 {
     int cellValue = 0;
-    if (inBounds(x - 1, y - 1, tempBoard.sizeX, tempBoard.sizeY) && tempBoard.cells[x - 1][y - 1].isMined)
+    if (inBounds(coordX - 1, coordY - 1, tempBoard.sizeX, tempBoard.sizeY) && tempBoard.cells[coordX - 1][coordY - 1].isMined)
     {
         cellValue++;
     }
-    if (inBounds(x, y - 1, tempBoard.sizeX, tempBoard.sizeY) && tempBoard.cells[x][y - 1].isMined)
+    if (inBounds(coordX, coordY - 1, tempBoard.sizeX, tempBoard.sizeY) && tempBoard.cells[coordX][coordY - 1].isMined)
     {
         cellValue++;
     }
-    if (inBounds(x + 1, y - 1, tempBoard.sizeX, tempBoard.sizeY) && tempBoard.cells[x + 1][y - 1].isMined)
+    if (inBounds(coordX + 1, coordY - 1, tempBoard.sizeX, tempBoard.sizeY) && tempBoard.cells[coordX + 1][coordY - 1].isMined)
     {
         cellValue++;
     }
-    if (inBounds(x + 1, y, tempBoard.sizeX, tempBoard.sizeY) && tempBoard.cells[x + 1][y].isMined)
+    if (inBounds(coordX + 1, coordY, tempBoard.sizeX, tempBoard.sizeY) && tempBoard.cells[coordX + 1][coordY].isMined)
     {
         cellValue++;
     }
-    if (inBounds(x + 1, y + 1, tempBoard.sizeX, tempBoard.sizeY) && tempBoard.cells[x + 1][y + 1].isMined)
+    if (inBounds(coordX + 1, coordY + 1, tempBoard.sizeX, tempBoard.sizeY) && tempBoard.cells[coordX + 1][coordY + 1].isMined)
     {
         cellValue++;
     }
-    if (inBounds(x, y + 1, tempBoard.sizeX, tempBoard.sizeY) && tempBoard.cells[x][y + 1].isMined)
+    if (inBounds(coordX, coordY + 1, tempBoard.sizeX, tempBoard.sizeY) && tempBoard.cells[coordX][coordY + 1].isMined)
     {
         cellValue++;
     }
-    if (inBounds(x - 1, y + 1, tempBoard.sizeX, tempBoard.sizeY) && tempBoard.cells[x - 1][y + 1].isMined)
+    if (inBounds(coordX - 1, coordY + 1, tempBoard.sizeX, tempBoard.sizeY) && tempBoard.cells[coordX - 1][coordY + 1].isMined)
     {
         cellValue++;
     }
-    if (inBounds(x - 1, y, tempBoard.sizeX, tempBoard.sizeY) && tempBoard.cells[x - 1][y].isMined)
+    if (inBounds(coordX - 1, coordY, tempBoard.sizeX, tempBoard.sizeY) && tempBoard.cells[coordX - 1][coordY].isMined)
     {
         cellValue++;
     }
