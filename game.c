@@ -32,6 +32,7 @@ void showScoreboard();
 int randomInt(int low, int high);
 Board *loadSave(char *fileName);
 bool checkForKey(int press, int key);
+bool inBounds(int coordX, int coordY, int sizeX, int sizeY);
 
 int main()
 {
@@ -40,7 +41,7 @@ int main()
         wasPressed[i] = false;
     }
     wasPressed[13] = true;
-    
+
     menuInstance();
 
     return 0;
@@ -71,9 +72,9 @@ void menuInstance()
 
         return;
     }
-    if(choice == 3)
+    if (choice == 3)
     {
-        
+
         return;
     }
 
@@ -82,7 +83,7 @@ void menuInstance()
 
 void gameInstance(Board *realBoard)
 {
-    if(realBoard == NULL)
+    if (realBoard == NULL)
     {
         setUpBoard(realBoard, BOARD_SIZE, BOARD_SIZE, MINE_COUNT);
     }
@@ -93,14 +94,25 @@ void gameInstance(Board *realBoard)
 void setUpBoard(Board *realBoard, int height, int width, int mines)
 {
     realBoard = malloc(sizeof(Board));
-    realBoard->cells = (Cell **)malloc(sizeof(Cell *) * height + sizeof(Cell) * width * height); 
+    realBoard->cells = (Cell **)malloc(sizeof(Cell *) * height + sizeof(Cell) * width * height);
     realBoard->sizeX = width;
     realBoard->sizeY = height;
-    realBoard->cursorX = realBoard->sizeX/2;
-    realBoard->cursorY = realBoard->sizeY/2;
-    for(int i = 0; i < mines; i++)
+    realBoard->cursorX = realBoard->sizeX / 2;
+    realBoard->cursorY = realBoard->sizeY / 2;
+    for (int i = 0; i < mines; i++)
     {
-        //
+        int x = randomInt(0, realBoard->sizeY), y = randomInt(0, realBoard->sizeX);
+        if (realBoard->cells[x][y].isMined)
+        {
+            i--;
+        }
+        else
+        {
+            realBoard->cells[x][y].isMined = true;
+            realBoard->cells[x][y].isMarked = false;
+            realBoard->cells[x][y].isRevealed = false;
+            realBoard->cells[x][y].cellValue = -1;
+        }
     }
 
     return;
@@ -204,4 +216,16 @@ bool checkForKey(int press, int key)
     }
 
     return false;
+}
+
+bool inBounds(int coordX, int coordY, int sizeX, int sizeY)
+{
+    if (coordX < 0 || coordX >= sizeX || coordY < 0 || coordY >= sizeY)
+    {
+        return false;
+    }
+    else
+    {
+        return true;
+    }
 }
