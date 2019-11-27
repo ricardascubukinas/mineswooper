@@ -5,8 +5,8 @@
 
 #include "con_lib.h"
 
-#define BOARD_SIZE 7
-#define MINE_COUNT 2
+#define BOARD_SIZE 10
+#define MINE_COUNT 10
 
 typedef struct Cell
 {
@@ -27,7 +27,7 @@ bool wasPressed[128];
 int showMenu(char *menuTitle, char *menuOptions[], int menuSize, char *inputMsg);
 void menuInstance();
 void gameInstance(Board *realBoard);
-void setUpBoard(Board *realBoard, int height, int width, int mines);
+Board *setUpBoard(Board *realBoard, int height, int width, int mines);
 void showScoreboard();
 int randInt(int low, int high);
 Board *loadSave(char *fileName);
@@ -45,6 +45,9 @@ int main()
     wasPressed[13] = true;
 
     menuInstance();
+
+    system("pause");
+    con_clear();
 
     return 0;
 }
@@ -81,19 +84,6 @@ void menuInstance()
 
         return;
     }
-
-    //con_clear();
-}
-
-void gameInstance(Board *realBoard)
-{
-    //system("pause");
-    if (realBoard == NULL)
-    {
-        setUpBoard(realBoard, BOARD_SIZE, BOARD_SIZE, MINE_COUNT);
-    }
-
-    return;
 }
 
 int showMenu(char *menuTitle, char *menuOptions[], int menuSize, char *inputMsg)
@@ -147,35 +137,96 @@ int showMenu(char *menuTitle, char *menuOptions[], int menuSize, char *inputMsg)
     }
 }
 
-void setUpBoard(Board *realBoard, int height, int width, int mines)
+void gameInstance(Board *realBoard)
+{
+    if (realBoard == NULL)
+    {
+        realBoard = setUpBoard(realBoard, BOARD_SIZE, BOARD_SIZE, MINE_COUNT);
+    }
+    for (int i = 0; i < realBoard->sizeY; i++)
+    {
+        for (int j = 0; j < realBoard->sizeX; j++)
+        {
+            if (!realBoard->cells[i][j].isMined)
+                printf("%3i", realBoard->cells[i][j].cellValue);
+            else
+            {
+                printf("%3c", '#');
+            }
+        }
+        printf("\n");
+    }
+    int posY = 0, oldY = 0;
+    int posX = 2, oldX = 2;
+    while (1)
+    {
+        int key = 0;
+        while (key = con_read_key())
+        {
+            if (checkForKey(key, 'w'))
+            {
+                posY--;
+            }
+
+            if (checkForKey(key, 's'))
+            {
+                posY++;
+            }
+
+            if (checkForKey(key, 'a'))
+            {
+                posX -= 3;
+            }
+            if (checkForKey(key, 'd'))
+            {
+                posX += 3;
+            }
+
+            if (posY > 9)
+                posY = 0;
+            if (posY < 0)
+                posY = 9;
+
+            if (posX < 2)
+                posX = (realBoard->sizeX) * 3 - 1;
+            if (posX > (realBoard->sizeX * 3) - 1)
+                posX = 2;
+
+            if (checkForKey(key, 13))
+            {
+                con_clear();
+
+                return;
+            }
+
+            con_set_color(COLOR_BLACK, COLOR_GRAY);
+            con_set_pos(oldX, oldY);
+
+            con_set_color(COLOR_RED, COLOR_BLUE);
+            con_set_pos(posX, posY);
+            fflush(stdout);
+
+            oldY = posY;
+            oldX = posX;
+        }
+    }
+    return;
+}
+
+Board *setUpBoard(Board *realBoard, int height, int width, int mines)
 {
     realBoard = malloc(sizeof(Board));
+    realBoard->mineCount = mines;
     realBoard->sizeX = width;
     realBoard->sizeY = height;
     realBoard->cursorX = realBoard->sizeX / 2;
     realBoard->cursorY = realBoard->sizeY / 2;
-    //realBoard->cells = (Cell **)malloc(realBoard->sizeY * sizeof(Cell *));
     Cell **temp = (Cell **)malloc(realBoard->sizeY * sizeof(Cell *));
     for (int i = 0; i < realBoard->sizeY; i++)
     {
         temp[i] = (Cell *)malloc(realBoard->sizeX * sizeof(Cell));
     }
     realBoard->cells = temp;
-    /*for (int i = 0; i < realBoard->sizeY; i++)
-    {
-        for (int j = 0; j < realBoard->sizeX; j++)
-        {
-            realBoard->cells[i][j].cellValue = i * realBoard->sizeY + j;
-        }
-    }
-    for (int i = 0; i < realBoard->sizeY; i++)
-    {
-        for (int j = 0; j < realBoard->sizeX; j++)
-        {
-            printf("%i ", realBoard->cells[i][j].cellValue);
-        }
-        printf("\n");
-    }*/
     for (int i = 0; i < realBoard->sizeY; i++)
     {
         for (int j = 0; j < realBoard->sizeX; j++)
@@ -185,14 +236,12 @@ void setUpBoard(Board *realBoard, int height, int width, int mines)
             realBoard->cells[i][j].isMarked = false;
         }
     }
-    for (int i = 0; i < mines; i++)
+    for (; mines > 0; mines--)
     {
-        int y = randInt(0, realBoard->sizeY - 1);
-        int x = randInt(0, realBoard->sizeX - 1);
-        printf("%i %i\n", x, y);
+        int y = randInt(0, realBoard->sizeY - 1), x = randInt(0, realBoard->sizeX - 1);
         if (realBoard->cells[y][x].isMined)
         {
-            i--;
+            mines++;
         }
         else
         {
@@ -210,8 +259,7 @@ void setUpBoard(Board *realBoard, int height, int width, int mines)
             }
         }
     }
-    scanf("%s");
-    return;
+    return realBoard;
 }
 
 int randInt(int low, int high)
