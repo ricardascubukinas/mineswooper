@@ -30,6 +30,7 @@ void gameInstance(Board *realBoard);
 Board *setUpBoard(Board *realBoard, int height, int width, int mines);
 void showScoreboard();
 int randInt(int low, int high);
+void saveBoard(Board realBoard, char *fileName);
 Board *loadSave(char *fileName);
 bool checkForKey(int press, int key);
 bool inBounds(int coordX, int coordY, int sizeX, int sizeY);
@@ -142,6 +143,7 @@ void gameInstance(Board *realBoard)
     if (realBoard == NULL)
     {
         realBoard = setUpBoard(realBoard, BOARD_SIZE, BOARD_SIZE, MINE_COUNT);
+        saveBoard(*realBoard, "save.bin");
     }
     for (int i = 0; i < realBoard->sizeY; i++)
     {
@@ -272,6 +274,21 @@ void showScoreboard()
     /* Not implemented yet */
 
     return;
+}
+
+void saveBoard(Board realBoard, char *fileName)
+{
+    FILE *fw = fopen(fileName, "wb");
+    fwrite(&realBoard.mineCount, sizeof(int), 1, fw);
+    fwrite(&realBoard.cursorX, sizeof(int), 1, fw);
+    fwrite(&realBoard.cursorY, sizeof(int), 1, fw);
+    fwrite(&realBoard.sizeX, sizeof(int), 1, fw);
+    fwrite(&realBoard.sizeY, sizeof(int), 1, fw);
+    for(int i = 0; i < realBoard.sizeY; i++)
+    {
+        fwrite(&realBoard.cells[i], sizeof(Cell), realBoard.sizeX, fw);
+    }
+    fclose(fw);
 }
 
 Board *loadSave(char *fileName)
