@@ -22,6 +22,9 @@ typedef struct Board
     Cell **cells;
 } Board;
 
+int areaX[9] = {0, -1, 0, 1, 1, 1, 0, -1, -1};
+int areaY[9] = {0, -1, -1, -1, 0, 1, 1, 1, 0};
+
 bool wasPressed[128];
 
 int showMenu(char *menuTitle, char *menuOptions[], int menuSize, char *inputMsg);
@@ -230,12 +233,34 @@ void gameInstance(Board *realBoard)
 
 Board *reveal(Board *tempBoard, bool isFirst)
 {
-    if(isFirst && tempBoard->cells[tempBoard->cursorY][tempBoard->cursorX].isMined)
+    int coordX = tempBoard->cursorX, coordY = tempBoard->cursorY;
+    if (isFirst && tempBoard->cells[coordX][coordY].isMined)
     {
         return NULL;
     }
+    else
+    {
+        for (int i = 0; i < 9; i++)
+        {
+            coordX = areaX[i] + tempBoard->cursorX;
+            coordY = areaY[i] + tempBoard->cursorY;
+            if (inBounds(coordX, coordY, tempBoard->sizeX, tempBoard->sizeY))
+            {
+                if (!tempBoard->cells[coordY][coordX].isRevealed && !tempBoard->cells[coordY][coordX].isMined)
+                {
+                    tempBoard->cells[coordY][coordX].isRevealed = true;
+                    if (tempBoard->cells[coordY][coordX].cellValue == 0 && !isFirst)
+                    {
+                        tempBoard->cursorX = coordX;
+                        tempBoard->cursorY = coordY;
+                        tempBoard = reveal(tempBoard, false);
+                    }
+                }
+            }
+        }
 
-    return tempBoard;
+        return tempBoard;
+    }
 }
 
 Board *setUpBoard(Board *realBoard, int height, int width, int mines)
