@@ -144,22 +144,31 @@ void gameInstance(Board *realBoard)
     {
         realBoard = setUpBoard(realBoard, BOARD_SIZE, BOARD_SIZE, MINE_COUNT);
         saveBoard(*realBoard, "save.bin");
-    }
-    for (int i = 0; i < realBoard->sizeY; i++)
-    {
-        for (int j = 0; j < realBoard->sizeX; j++)
+        realBoard = loadSave("save.bin");
+        if (realBoard == NULL)
         {
-            if (!realBoard->cells[i][j].isMined)
-                printf("%3i", realBoard->cells[i][j].cellValue);
-            else
+            printf("save-file was corrupted\n");
+        }
+        else
+        {
+            for (int i = 0; i < realBoard->sizeY; i++)
             {
-                printf("%3c", '#');
+                for (int j = 0; j < realBoard->sizeX; j++)
+                {
+                    if (!realBoard->cells[i][j].isMined)
+                        printf("%2i ", realBoard->cells[i][j].cellValue);
+                    else
+                    {
+                        printf("%2c ", '#');
+                    }
+                }
+                printf("\n");
             }
         }
-        printf("\n");
     }
+
     int posY = 0, oldY = 0;
-    int posX = 2, oldX = 2;
+    int posX = 1, oldX = 1;
     while (1)
     {
         int key = 0;
@@ -184,15 +193,15 @@ void gameInstance(Board *realBoard)
                 posX += 3;
             }
 
-            if (posY > 9)
+            if (posY > realBoard->sizeY - 1)
                 posY = 0;
             if (posY < 0)
-                posY = 9;
+                posY = realBoard->sizeY - 1;
 
-            if (posX < 2)
-                posX = (realBoard->sizeX) * 3 - 1;
+            if (posX < 1)
+                posX = (realBoard->sizeX * 3) - 2;
             if (posX > (realBoard->sizeX * 3) - 1)
-                posX = 2;
+                posX = 1;
 
             if (checkForKey(key, 13))
             {
@@ -279,30 +288,24 @@ void showScoreboard()
 void saveBoard(Board realBoard, char *fileName)
 {
     FILE *fw = fopen(fileName, "wb");
-    fwrite(&realBoard.mineCount, sizeof(int), 1, fw);
-    fwrite(&realBoard.cursorX, sizeof(int), 1, fw);
-    fwrite(&realBoard.cursorY, sizeof(int), 1, fw);
-    fwrite(&realBoard.sizeX, sizeof(int), 1, fw);
-    fwrite(&realBoard.sizeY, sizeof(int), 1, fw);
-    for(int i = 0; i < realBoard.sizeY; i++)
-    {
-        fwrite(&realBoard.cells[i], sizeof(Cell), realBoard.sizeX, fw);
-    }
+    fwrite(&realBoard, sizeof(Board), 1, fw);
+
     fclose(fw);
 }
 
 Board *loadSave(char *fileName)
 {
     Board *loadedBoard = malloc(sizeof(Board));
-    /* Show menu of files return board through the pointer*/
-    if (0) // True statement
-    {
+    FILE *fr = fopen(fileName, "rb");
 
+    if (fread(loadedBoard, sizeof(Board), 1, fr) == 1) // True statement
+    {
+        fclose(fr);
         return loadedBoard;
     }
     else
     {
-
+        fclose(fr);
         return NULL;
     }
 }
