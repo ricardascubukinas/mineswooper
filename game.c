@@ -5,8 +5,8 @@
 
 #include "con_lib.h"
 
-#define BOARD_SIZE 24
-#define MINE_COUNT 99
+#define BOARD_SIZE 7
+#define MINE_COUNT 2
 
 typedef struct Cell
 {
@@ -29,7 +29,7 @@ void menuInstance();
 void gameInstance(Board *realBoard);
 void setUpBoard(Board *realBoard, int height, int width, int mines);
 void showScoreboard();
-int randomInt(int low, int high);
+int randInt(int low, int high);
 Board *loadSave(char *fileName);
 bool checkForKey(int press, int key);
 bool inBounds(int coordX, int coordY, int sizeX, int sizeY);
@@ -37,6 +37,7 @@ int countNearbyMines(Board tempBoard, int x, int y);
 
 int main()
 {
+    srand(time(NULL));
     for (int i = 0; i < 128; i++)
     {
         wasPressed[i] = false;
@@ -56,6 +57,8 @@ void menuInstance()
     if (choice == 0)
     {
         gameInstance(realBoard);
+
+        return;
     }
     else if (choice == 1)
     {
@@ -79,11 +82,12 @@ void menuInstance()
         return;
     }
 
-    con_clear();
+    //con_clear();
 }
 
 void gameInstance(Board *realBoard)
 {
+    //system("pause");
     if (realBoard == NULL)
     {
         setUpBoard(realBoard, BOARD_SIZE, BOARD_SIZE, MINE_COUNT);
@@ -92,57 +96,11 @@ void gameInstance(Board *realBoard)
     return;
 }
 
-void setUpBoard(Board *realBoard, int height, int width, int mines)
-{
-    realBoard = malloc(sizeof(Board));
-    realBoard->cells = (Cell **)malloc(sizeof(Cell *) * height + sizeof(Cell) * width * height);
-    realBoard->sizeX = width;
-    realBoard->sizeY = height;
-    realBoard->cursorX = realBoard->sizeX / 2;
-    realBoard->cursorY = realBoard->sizeY / 2;
-    for (int i = 0; i < realBoard->sizeY; i++)
-    {
-        for (int j = 0; i < realBoard->sizeX; j++)
-        {
-            realBoard->cells[i][j].isMined = false;
-            realBoard->cells[i][j].isRevealed = false;
-            realBoard->cells[i][j].isMarked = false;
-        }
-    }
-
-    for (int i = 0; i < mines; i++)
-    {
-        int x = randomInt(0, realBoard->sizeY), y = randomInt(0, realBoard->sizeX);
-        if (realBoard->cells[x][y].isMined)
-        {
-            i--;
-        }
-        else
-        {
-            realBoard->cells[x][y].isMined = true;
-            realBoard->cells[x][y].cellValue = -1;
-        }
-    }
-
-    for (int i = 0; i < realBoard->sizeY; i++)
-    {
-        for (int j = 0; i < realBoard->sizeX; j++)
-        {
-            if (!realBoard->cells[i][j].isMined)
-            {
-                realBoard->cells[i][j].cellValue = countNearbyMines(*realBoard, i, j);
-            }
-        }
-    }
-    return;
-}
-
 int showMenu(char *menuTitle, char *menuOptions[], int menuSize, char *inputMsg)
 {
     con_clear();
 
     int posY = 1, oldY = 0;
-    ;
     printf("%s\n", menuTitle);
     for (int i = 0; i < menuSize; i++)
     {
@@ -189,11 +147,76 @@ int showMenu(char *menuTitle, char *menuOptions[], int menuSize, char *inputMsg)
     }
 }
 
-int randomInt(int low, int high)
+void setUpBoard(Board *realBoard, int height, int width, int mines)
 {
-    srand(time(NULL));
+    realBoard = malloc(sizeof(Board));
+    realBoard->sizeX = width;
+    realBoard->sizeY = height;
+    realBoard->cursorX = realBoard->sizeX / 2;
+    realBoard->cursorY = realBoard->sizeY / 2;
+    //realBoard->cells = (Cell **)malloc(realBoard->sizeY * sizeof(Cell *));
+    Cell **temp = (Cell **)malloc(realBoard->sizeY * sizeof(Cell *));
+    for (int i = 0; i < realBoard->sizeY; i++)
+    {
+        temp[i] = (Cell *)malloc(realBoard->sizeX * sizeof(Cell));
+    }
+    realBoard->cells = temp;
+    /*for (int i = 0; i < realBoard->sizeY; i++)
+    {
+        for (int j = 0; j < realBoard->sizeX; j++)
+        {
+            realBoard->cells[i][j].cellValue = i * realBoard->sizeY + j;
+        }
+    }
+    for (int i = 0; i < realBoard->sizeY; i++)
+    {
+        for (int j = 0; j < realBoard->sizeX; j++)
+        {
+            printf("%i ", realBoard->cells[i][j].cellValue);
+        }
+        printf("\n");
+    }*/
+    for (int i = 0; i < realBoard->sizeY; i++)
+    {
+        for (int j = 0; j < realBoard->sizeX; j++)
+        {
+            realBoard->cells[i][j].isMined = false;
+            realBoard->cells[i][j].isRevealed = false;
+            realBoard->cells[i][j].isMarked = false;
+        }
+    }
+    for (int i = 0; i < mines; i++)
+    {
+        int y = randInt(0, realBoard->sizeY - 1);
+        int x = randInt(0, realBoard->sizeX - 1);
+        printf("%i %i\n", x, y);
+        if (realBoard->cells[y][x].isMined)
+        {
+            i--;
+        }
+        else
+        {
+            realBoard->cells[y][x].isMined = true;
+            realBoard->cells[y][x].cellValue = -1;
+        }
+    }
+    for (int i = 0; i < realBoard->sizeY; i++)
+    {
+        for (int j = 0; j < realBoard->sizeX; j++)
+        {
+            if (!realBoard->cells[i][j].isMined)
+            {
+                realBoard->cells[i][j].cellValue = countNearbyMines(*realBoard, i, j);
+            }
+        }
+    }
+    scanf("%s");
+    return;
+}
 
-    return rand() % (high - low + 1) + high;
+int randInt(int low, int high)
+{
+    return rand() % (high - low + 1) + low;
 }
 
 void showScoreboard()
@@ -284,4 +307,6 @@ int countNearbyMines(Board tempBoard, int coordX, int coordY)
     {
         cellValue++;
     }
+
+    return cellValue;
 }
