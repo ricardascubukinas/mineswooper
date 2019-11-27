@@ -382,37 +382,13 @@ bool inBounds(int coordX, int coordY, int sizeX, int sizeY)
 int countNearbyMines(Board tempBoard, int coordX, int coordY)
 {
     int cellValue = 0;
-    if (inBounds(coordX - 1, coordY - 1, tempBoard.sizeX, tempBoard.sizeY) && tempBoard.cells[coordX - 1][coordY - 1].isMined)
+    for (int i = 1; i < 9; i++)
     {
-        cellValue++;
-    }
-    if (inBounds(coordX, coordY - 1, tempBoard.sizeX, tempBoard.sizeY) && tempBoard.cells[coordX][coordY - 1].isMined)
-    {
-        cellValue++;
-    }
-    if (inBounds(coordX + 1, coordY - 1, tempBoard.sizeX, tempBoard.sizeY) && tempBoard.cells[coordX + 1][coordY - 1].isMined)
-    {
-        cellValue++;
-    }
-    if (inBounds(coordX + 1, coordY, tempBoard.sizeX, tempBoard.sizeY) && tempBoard.cells[coordX + 1][coordY].isMined)
-    {
-        cellValue++;
-    }
-    if (inBounds(coordX + 1, coordY + 1, tempBoard.sizeX, tempBoard.sizeY) && tempBoard.cells[coordX + 1][coordY + 1].isMined)
-    {
-        cellValue++;
-    }
-    if (inBounds(coordX, coordY + 1, tempBoard.sizeX, tempBoard.sizeY) && tempBoard.cells[coordX][coordY + 1].isMined)
-    {
-        cellValue++;
-    }
-    if (inBounds(coordX - 1, coordY + 1, tempBoard.sizeX, tempBoard.sizeY) && tempBoard.cells[coordX - 1][coordY + 1].isMined)
-    {
-        cellValue++;
-    }
-    if (inBounds(coordX - 1, coordY, tempBoard.sizeX, tempBoard.sizeY) && tempBoard.cells[coordX - 1][coordY].isMined)
-    {
-        cellValue++;
+        int tempX = coordX + areaX[i], tempY = coordY + areaY[i];
+        if (inBounds(tempX, tempY, tempBoard.sizeX, tempBoard.sizeY) && tempBoard.cells[tempX][tempY].isMined)
+        {
+            cellValue++;
+        }
     }
 
     return cellValue;
