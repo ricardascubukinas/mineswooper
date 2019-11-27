@@ -27,6 +27,7 @@ bool wasPressed[128];
 int showMenu(char *menuTitle, char *menuOptions[], int menuSize, char *inputMsg);
 void menuInstance();
 void gameInstance(Board *realBoard);
+Board *reveal(Board *tempBoard, bool isFirst);
 Board *setUpBoard(Board *realBoard, int height, int width, int mines);
 void showScoreboard();
 int randInt(int low, int high);
@@ -151,22 +152,21 @@ void gameInstance(Board *realBoard)
         }
         else
         {
-            for (int i = 0; i < realBoard->sizeY; i++)
-            {
-                for (int j = 0; j < realBoard->sizeX; j++)
-                {
-                    if (!realBoard->cells[i][j].isMined)
-                        printf("%2i ", realBoard->cells[i][j].cellValue);
-                    else
-                    {
-                        printf("%2c ", '#');
-                    }
-                }
-                printf("\n");
-            }
         }
     }
-
+    for (int i = 0; i < realBoard->sizeY; i++)
+    {
+        for (int j = 0; j < realBoard->sizeX; j++)
+        {
+            if (!realBoard->cells[i][j].isMined)
+                printf("%2i ", realBoard->cells[i][j].cellValue);
+            else
+            {
+                printf("%2c ", '#');
+            }
+        }
+        printf("\n");
+    }
     int posY = 0, oldY = 0;
     int posX = 1, oldX = 1;
     while (1)
@@ -203,6 +203,9 @@ void gameInstance(Board *realBoard)
             if (posX > (realBoard->sizeX * 3) - 1)
                 posX = 1;
 
+            realBoard->cursorX = posX;
+            realBoard->cursorY = posY;
+            //reveal(realBoard, true);
             if (checkForKey(key, 13))
             {
                 con_clear();
@@ -221,7 +224,18 @@ void gameInstance(Board *realBoard)
             oldX = posX;
         }
     }
+
     return;
+}
+
+Board *reveal(Board *tempBoard, bool isFirst)
+{
+    if(isFirst && tempBoard->cells[tempBoard->cursorY][tempBoard->cursorX].isMined)
+    {
+        return NULL;
+    }
+
+    return tempBoard;
 }
 
 Board *setUpBoard(Board *realBoard, int height, int width, int mines)
