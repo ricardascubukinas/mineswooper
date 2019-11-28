@@ -97,14 +97,14 @@ int showMenu(char *menuTitle, char *menuOptions[], int menuSize, char *inputMsg)
 {
     con_clear();
 
-    int posY = 1, oldY = 0;
+    int posY = 1;
     printf("%s\n", menuTitle);
     for (int i = 0; i < menuSize; i++)
     {
         printf("%i. %s\n", i, menuOptions[i]);
     }
     printf("%s\n", inputMsg);
-
+    printf("Controls: w - up, s - down\n");
     while (1)
     {
         int key = 0;
@@ -132,11 +132,9 @@ int showMenu(char *menuTitle, char *menuOptions[], int menuSize, char *inputMsg)
                 return posY - 1;
             }
 
-            con_set_color(COLOR_RED, COLOR_BLUE);
+            con_set_color(COLOR_BLACK, COLOR_GRAY);
             con_set_pos(0, posY);
             fflush(stdout);
-
-            oldY = posY;
         }
     }
 }
@@ -145,21 +143,20 @@ void gameInstance(Board *realBoard)
 {
     if (realBoard == NULL)
     {
-        realBoard = setUpSampleBoard();
-        //realBoard = setUpBoard(realBoard, BOARD_SIZE, BOARD_SIZE, MINE_COUNT);
+        //realBoard = setUpSampleBoard();
+        realBoard = setUpBoard(realBoard, BOARD_SIZE, BOARD_SIZE, MINE_COUNT);
         saveBoard(*realBoard, "save.bin");
         realBoard = loadSave("save.bin");
         if (realBoard == NULL)
         {
-            printf("save-file was corrupted\n");
+            printf("Save-file was corrupted\n");
         }
         else
         {
         }
     }
     printBoard(*realBoard);
-    int posY = 0, oldY = 0;
-    int posX = 2, oldX = 2;
+    int posX = 2, posY = 0;
     while (1)
     {
         int key = 0;
@@ -187,7 +184,31 @@ void gameInstance(Board *realBoard)
             {
                 return;
             }
+            if (checkForKey(key, 'm'))
+            {
+                char *gameMenu[3] = {"Save", "Go back", "Quit"};
+                int choice = showMenu("In game menu", gameMenu, 3, "Pick your option");
+                if (choice == 0)
+                {
+                    printf("Enter a file name(to save in current directoy) or full file's path, don't type in the extension, maximum length 100 characters\n");
+                    char fileName[105];
+                    scanf("%s", fileName);
+                    strcat(fileName, ".bin");
+                    saveBoard(*realBoard, fileName);
+                    system("pause");
+                    printBoard(*realBoard);
 
+                }
+                else if (choice == 1)
+                {
+                    printBoard(*realBoard);
+                }
+                else
+                {
+                    return;
+                }
+                
+            }
             if (posY > realBoard->sizeY - 1)
                 posY = 0;
             if (posY < 0)
@@ -386,6 +407,7 @@ void loseScreen()
 
 void printBoard(Board tempBoard)
 {
+    con_clear();
     for (int i = 0; i < tempBoard.sizeY; i++)
     {
         for (int j = 0; j < tempBoard.sizeX; j++)
