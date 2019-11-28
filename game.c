@@ -5,8 +5,8 @@
 
 #include "con_lib.h"
 
-#define BOARD_SIZE 10
-#define MINE_COUNT 10
+#define BOARD_SIZE 6
+#define MINE_COUNT 1
 
 typedef struct Cell
 {
@@ -31,7 +31,11 @@ int showMenu(char *menuTitle, char *menuOptions[], int menuSize, char *inputMsg)
 void menuInstance();
 void gameInstance(Board *realBoard);
 Board *reveal(Board *tempBoard, bool isFirst);
+Board *checkForFails(Board *tempBoard);
 Board *setUpBoard(Board *realBoard, int height, int width, int mines);
+Board *setUpSampleBoard();
+void loseScreen();
+void printBoard(Board tempBoard);
 void showScoreboard();
 int randInt(int low, int high);
 void saveBoard(Board realBoard, char *fileName);
@@ -50,8 +54,6 @@ int main()
     wasPressed[13] = true;
 
     menuInstance();
-
-    system("pause");
     con_clear();
 
     return 0;
@@ -130,9 +132,6 @@ int showMenu(char *menuTitle, char *menuOptions[], int menuSize, char *inputMsg)
                 return posY - 1;
             }
 
-            con_set_color(COLOR_BLACK, COLOR_GRAY);
-            con_set_pos(0, oldY);
-
             con_set_color(COLOR_RED, COLOR_BLUE);
             con_set_pos(0, posY);
             fflush(stdout);
@@ -146,7 +145,8 @@ void gameInstance(Board *realBoard)
 {
     if (realBoard == NULL)
     {
-        realBoard = setUpBoard(realBoard, BOARD_SIZE, BOARD_SIZE, MINE_COUNT);
+        realBoard = setUpSampleBoard();
+        //realBoard = setUpBoard(realBoard, BOARD_SIZE, BOARD_SIZE, MINE_COUNT);
         saveBoard(*realBoard, "save.bin");
         realBoard = loadSave("save.bin");
         if (realBoard == NULL)
@@ -157,21 +157,9 @@ void gameInstance(Board *realBoard)
         {
         }
     }
-    for (int i = 0; i < realBoard->sizeY; i++)
-    {
-        for (int j = 0; j < realBoard->sizeX; j++)
-        {
-            if (!realBoard->cells[i][j].isMined)
-                printf("%2i ", realBoard->cells[i][j].cellValue);
-            else
-            {
-                printf("%2c ", '#');
-            }
-        }
-        printf("\n");
-    }
+    printBoard(*realBoard);
     int posY = 0, oldY = 0;
-    int posX = 1, oldX = 1;
+    int posX = 2, oldX = 2;
     while (1)
     {
         int key = 0;
@@ -195,36 +183,41 @@ void gameInstance(Board *realBoard)
             {
                 posX += 3;
             }
+            if (checkForKey(key, 'q'))
+            {
+                return;
+            }
 
             if (posY > realBoard->sizeY - 1)
                 posY = 0;
             if (posY < 0)
                 posY = realBoard->sizeY - 1;
 
-            if (posX < 1)
-                posX = (realBoard->sizeX * 3) - 2;
+            if (posX < 2)
+                posX = (realBoard->sizeX * 3) - 1;
             if (posX > (realBoard->sizeX * 3) - 1)
-                posX = 1;
+                posX = 2;
 
-            realBoard->cursorX = posX;
+            realBoard->cursorX = (posX - 2) / 3;
             realBoard->cursorY = posY;
-            //reveal(realBoard, true);
             if (checkForKey(key, 13))
             {
                 con_clear();
-
-                return;
+                realBoard = reveal(realBoard, true);
+                if (realBoard == NULL)
+                {
+                    loseScreen();
+                    return;
+                }
+                else
+                {
+                    printBoard(*realBoard);
+                }
             }
 
             con_set_color(COLOR_BLACK, COLOR_GRAY);
-            con_set_pos(oldX, oldY);
-
-            con_set_color(COLOR_RED, COLOR_BLUE);
             con_set_pos(posX, posY);
             fflush(stdout);
-
-            oldY = posY;
-            oldX = posX;
         }
     }
 
@@ -234,33 +227,67 @@ void gameInstance(Board *realBoard)
 Board *reveal(Board *tempBoard, bool isFirst)
 {
     int coordX = tempBoard->cursorX, coordY = tempBoard->cursorY;
-    if (isFirst && tempBoard->cells[coordX][coordY].isMined)
+    if (isFirst && tempBoard->cells[coordY][coordX].isMined)
     {
         return NULL;
     }
     else
     {
-        for (int i = 0; i < 9; i++)
+        if (tempBoard->cells[coordY][coordX].cellValue == 0)
         {
-            coordX = areaX[i] + tempBoard->cursorX;
-            coordY = areaY[i] + tempBoard->cursorY;
-            if (inBounds(coordX, coordY, tempBoard->sizeX, tempBoard->sizeY))
+            for (int i = 0; i < 9; i++)
             {
-                if (!tempBoard->cells[coordY][coordX].isRevealed && !tempBoard->cells[coordY][coordX].isMined)
+                coordX = areaX[i] + tempBoard->cursorX;
+                coordY = areaY[i] + tempBoard->cursorY;
+                if (inBounds(coordX, coordY, tempBoard->sizeX, tempBoard->sizeY))
                 {
-                    tempBoard->cells[coordY][coordX].isRevealed = true;
-                    if (tempBoard->cells[coordY][coordX].cellValue == 0 && !isFirst)
+                    if (!tempBoard->cells[coordY][coordX].isRevealed && !tempBoard->cells[coordY][coordX].isMined)
                     {
-                        tempBoard->cursorX = coordX;
-                        tempBoard->cursorY = coordY;
-                        tempBoard = reveal(tempBoard, false);
+                        tempBoard->cells[coordY][coordX].isRevealed = true;
+                        if (tempBoard->cells[coordY][coordX].cellValue == 0 && i != 0)
+                        {
+                            tempBoard->cursorX = coordX;
+                            tempBoard->cursorY = coordY;
+                            tempBoard = reveal(tempBoard, false);
+                        }
                     }
                 }
             }
         }
+        else
+        {
+            tempBoard->cells[coordY][coordX].isRevealed = true;
+        }
 
+        tempBoard = checkForFails(tempBoard);
         return tempBoard;
     }
+}
+
+Board *checkForFails(Board *tempBoard)
+{
+    for (int i = 0; i < tempBoard->sizeY; i++)
+    {
+        for (int j = 0; j < tempBoard->sizeX; j++)
+        {
+            if (!tempBoard->cells[i][j].isRevealed)
+            {
+                for (int k = 0; k < 9; k++)
+                {
+                    int tempX = j + areaX[k], tempY = i + areaY[k];
+                    if (inBounds(tempX, tempY, tempBoard->sizeX, tempBoard->sizeY))
+                    {
+                        if (tempBoard->cells[tempY][tempX].cellValue == 0 && tempBoard->cells[tempY][tempX].isRevealed)
+                        {
+                            tempBoard->cells[i][j].isRevealed = true;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return tempBoard;
 }
 
 Board *setUpBoard(Board *realBoard, int height, int width, int mines)
@@ -310,6 +337,76 @@ Board *setUpBoard(Board *realBoard, int height, int width, int mines)
         }
     }
     return realBoard;
+}
+
+Board *setUpSampleBoard()
+{
+    Board *realBoard = malloc(sizeof(Board));
+    realBoard->mineCount = 1;
+    realBoard->sizeX = 6;
+    realBoard->sizeY = 6;
+    realBoard->cursorX = realBoard->sizeX / 2;
+    realBoard->cursorY = realBoard->sizeY / 2;
+    Cell **temp = (Cell **)malloc(realBoard->sizeY * sizeof(Cell *));
+    for (int i = 0; i < realBoard->sizeY; i++)
+    {
+        temp[i] = (Cell *)malloc(realBoard->sizeX * sizeof(Cell));
+    }
+    realBoard->cells = temp;
+    for (int i = 0; i < realBoard->sizeY; i++)
+    {
+        for (int j = 0; j < realBoard->sizeX; j++)
+        {
+            realBoard->cells[i][j].isMined = false;
+            realBoard->cells[i][j].isRevealed = false;
+            realBoard->cells[i][j].isMarked = false;
+        }
+    }
+    realBoard->cells[4][5].isMined = true;
+    realBoard->cells[4][5].cellValue = -1;
+    for (int i = 0; i < realBoard->sizeY; i++)
+    {
+        for (int j = 0; j < realBoard->sizeX; j++)
+        {
+            if (!realBoard->cells[i][j].isMined)
+            {
+                realBoard->cells[i][j].cellValue = countNearbyMines(*realBoard, i, j);
+            }
+        }
+    }
+    return realBoard;
+}
+
+void loseScreen()
+{
+    printf("You've lost\n");
+    system("pause");
+    menuInstance();
+}
+
+void printBoard(Board tempBoard)
+{
+    for (int i = 0; i < tempBoard.sizeY; i++)
+    {
+        for (int j = 0; j < tempBoard.sizeX; j++)
+        {
+            if (!tempBoard.cells[i][j].isRevealed || tempBoard.cells[i][j].isMined)
+            {
+                printf("%3c", '#');
+            }
+            else if (tempBoard.cells[i][j].isRevealed)
+            {
+                printf("%3i", tempBoard.cells[i][j].cellValue);
+            }
+            else if (tempBoard.cells[i][j].isMarked)
+            {
+                printf("%3c", '*');
+            }
+        }
+        printf("\n");
+    }
+
+    return;
 }
 
 int randInt(int low, int high)
