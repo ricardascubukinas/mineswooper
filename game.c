@@ -105,6 +105,9 @@ int showMenu(char *menuTitle, char *menuOptions[], int menuSize, char *inputMsg)
     }
     printf("%s\n", inputMsg);
     printf("Controls: w - up, s - down\n");
+    con_set_color(COLOR_BLACK, COLOR_GRAY);
+    con_set_pos(0, posY);
+    fflush(stdout);
     while (1)
     {
         int key = 0;
@@ -145,8 +148,8 @@ void gameInstance(Board *realBoard)
     {
         //realBoard = setUpSampleBoard();
         realBoard = setUpBoard(realBoard, BOARD_SIZE, BOARD_SIZE, MINE_COUNT);
-        saveBoard(*realBoard, "save.bin");
-        realBoard = loadSave("save.bin");
+        //saveBoard(*realBoard, "save.bin");
+        //realBoard = loadSave("save.bin");
         if (realBoard == NULL)
         {
             printf("Save-file was corrupted\n");
@@ -186,28 +189,50 @@ void gameInstance(Board *realBoard)
             }
             if (checkForKey(key, 'm'))
             {
-                char *gameMenu[3] = {"Save", "Go back", "Quit"};
-                int choice = showMenu("In game menu", gameMenu, 3, "Pick your option");
+                char *gameMenu[4] = {"Save", "Go back", "Quit to main menu", "Quit game"};
+                int choice = showMenu("In game menu", gameMenu, 4, "Pick your option");
                 if (choice == 0)
                 {
-                    printf("Enter a file name(to save in current directoy) or full file's path, don't type in the extension, maximum length 100 characters\n");
-                    char fileName[105];
-                    scanf("%s", fileName);
+                    char fileName[1000];
+                    while (1)
+                    {
+                        printf("Enter a file name(to save in current directoy) or full file's path, don't type in the extension, maximum length 100 characters\n");
+                        fileName[0] = '\0';
+                        gets(fileName);
+                        if (strlen(fileName) > 100)
+                        {
+                            printf("Error! File's name length is too long.\n");
+                        }
+                        else if (fileName == NULL || fileName[0] == '\n' || fileName[0] == '\0')
+                        {
+                            printf("You can't enter an empty string\n");
+                        }   
+                        else
+                        {
+                            printf("Success! Proceeding to save to file %s.bin.\n", fileName);
+                            break;
+                        }
+
+                    }
                     strcat(fileName, ".bin");
                     saveBoard(*realBoard, fileName);
                     system("pause");
                     printBoard(*realBoard);
-
                 }
                 else if (choice == 1)
                 {
                     printBoard(*realBoard);
                 }
+                else if (choice == 2)
+                {
+                    menuInstance();
+                    realBoard = NULL;
+                    return;
+                }
                 else
                 {
                     return;
                 }
-                
             }
             if (posY > realBoard->sizeY - 1)
                 posY = 0;
