@@ -38,7 +38,7 @@ void loseScreen();
 void printBoard(Board tempBoard);
 void showScoreboard();
 int randInt(int low, int high);
-void saveBoard(Board realBoard, char *fileName);
+void saveBoard(Board realBoard);
 Board *loadSave(char *fileName);
 bool checkForKey(int press, int key);
 bool inBounds(int coordX, int coordY, int sizeX, int sizeY);
@@ -193,29 +193,7 @@ void gameInstance(Board *realBoard)
                 int choice = showMenu("In game menu", gameMenu, 4, "Pick your option");
                 if (choice == 0)
                 {
-                    char fileName[1000];
-                    while (1)
-                    {
-                        printf("Enter a file name(to save in current directoy) or full file's path, don't type in the extension, maximum length 100 characters\n");
-                        fileName[0] = '\0';
-                        gets(fileName);
-                        if (strlen(fileName) > 100)
-                        {
-                            printf("Error! File's name length is too long.\n");
-                        }
-                        else if (fileName == NULL || fileName[0] == '\n' || fileName[0] == '\0')
-                        {
-                            printf("You can't enter an empty string\n");
-                        }   
-                        else
-                        {
-                            printf("Success! Proceeding to save to file %s.bin.\n", fileName);
-                            break;
-                        }
-
-                    }
-                    strcat(fileName, ".bin");
-                    saveBoard(*realBoard, fileName);
+                    saveBoard(*realBoard);
                     system("pause");
                     printBoard(*realBoard);
                 }
@@ -468,8 +446,29 @@ void showScoreboard()
     return;
 }
 
-void saveBoard(Board realBoard, char *fileName)
+void saveBoard(Board realBoard)
 {
+    char fileName[1000];
+    while (1)
+    {
+        printf("Enter a file name(to save in current directoy) or full file's path, don't type in the extension, maximum length 100 characters\n");
+        fileName[0] = '\0';
+        gets(fileName);
+        if (strlen(fileName) > 100)
+        {
+            printf("Error! File's name length is too long.\n");
+        }
+        else if (fileName == NULL || fileName[0] == '\n' || fileName[0] == '\0')
+        {
+            printf("You can't enter an empty string\n");
+        }
+        else
+        {
+            printf("Success! Proceeding to save to file %s.bin.\n", fileName);
+            break;
+        }
+    }
+    strcat(fileName, ".bin");
     FILE *fw = fopen(fileName, "wb");
     fwrite(&realBoard, sizeof(Board), 1, fw);
 
