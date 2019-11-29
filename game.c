@@ -111,7 +111,7 @@ int showMenu(char *menuTitle, char *menuOptions[], int menuSize, char *inputMsg)
     while (1)
     {
         int key = 0;
-        while (key = con_read_key())
+        while ((key = con_read_key()))
         {
             if (checkForKey(key, 'w'))
             {
@@ -163,7 +163,7 @@ void gameInstance(Board *realBoard)
     while (1)
     {
         int key = 0;
-        while (key = con_read_key())
+        while ((key = con_read_key()))
         {
             if (checkForKey(key, 'w'))
             {
@@ -430,7 +430,8 @@ void printBoard(Board tempBoard)
         }
         printf("\n");
     }
-
+    printf("  Controls: w - up, s - down, a - left, d - right, m - open menu\n");
+    printf("  ENTER - reveal selected cell, SHIFT - mark selected cell\n");
     return;
 }
 
@@ -453,7 +454,7 @@ void saveBoard(Board realBoard)
     {
         printf("Enter a file name(to save in current directoy) or full file's path, don't type in the extension, maximum length 100 characters\n");
         fileName[0] = '\0';
-        gets(fileName);
+        fgets(fileName, 1000, stdin);
         if (strlen(fileName) > 100)
         {
             printf("Error! File's name length is too long.\n");
