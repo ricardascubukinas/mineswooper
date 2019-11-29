@@ -30,6 +30,7 @@ bool wasPressed[128];
 int showMenu(char *menuTitle, char *menuOptions[], int menuSize, char *inputMsg);
 void menuInstance();
 void gameInstance(Board *realBoard);
+void inGameMenu(Board *realBoard);
 Board *reveal(Board *tempBoard, bool isFirst);
 Board *checkForFails(Board *tempBoard);
 Board *setUpBoard(Board *realBoard, int height, int width, int mines);
@@ -43,6 +44,7 @@ Board *loadSave(char *fileName);
 bool checkForKey(int press, int key);
 bool inBounds(int coordX, int coordY, int sizeX, int sizeY);
 int countNearbyMines(Board tempBoard, int x, int y);
+void exitGame(Board *realBoard);
 
 int main()
 {
@@ -88,8 +90,7 @@ void menuInstance()
     }
     else
     {
-
-        return;
+        exitGame(NULL);
     }
 }
 
@@ -183,34 +184,9 @@ void gameInstance(Board *realBoard)
             {
                 posX += 3;
             }
-            if (checkForKey(key, 'q'))
-            {
-                return;
-            }
             if (checkForKey(key, 'm'))
             {
-                char *gameMenu[4] = {"Save", "Go back", "Quit to main menu", "Quit game"};
-                int choice = showMenu("In game menu", gameMenu, 4, "Pick your option");
-                if (choice == 0)
-                {
-                    saveBoard(*realBoard);
-                    system("pause");
-                    printBoard(*realBoard);
-                }
-                else if (choice == 1)
-                {
-                    printBoard(*realBoard);
-                }
-                else if (choice == 2)
-                {
-                    menuInstance();
-                    realBoard = NULL;
-                    return;
-                }
-                else
-                {
-                    return;
-                }
+                inGameMenu(realBoard);
             }
             if (posY > realBoard->sizeY - 1)
                 posY = 0;
@@ -246,6 +222,32 @@ void gameInstance(Board *realBoard)
     }
 
     return;
+}
+
+void inGameMenu(Board *realBoard)
+{
+    char *gameMenu[4] = {"Save", "Go back", "Quit to main menu", "Quit game"};
+    int choice = showMenu("In game menu", gameMenu, 4, "Pick your option");
+    if (choice == 0)
+    {
+        saveBoard(*realBoard);
+        system("pause");
+        inGameMenu(realBoard);
+    }
+    else if (choice == 1)
+    {
+        printBoard(*realBoard);
+    }
+    else if (choice == 2)
+    {
+        menuInstance();
+        free(realBoard);
+        return;
+    }
+    else
+    {
+        exitGame(realBoard);
+    }
 }
 
 Board *reveal(Board *tempBoard, bool isFirst)
@@ -465,7 +467,8 @@ void saveBoard(Board realBoard)
         }
         else
         {
-            printf("Success! Proceeding to save to file %s.bin.\n", fileName);
+            strtok(fileName, "\n");
+            printf("Success! Proceeding to save to file '%s.bin'\n", fileName);
             break;
         }
     }
@@ -536,4 +539,15 @@ int countNearbyMines(Board tempBoard, int coordX, int coordY)
     }
 
     return cellValue;
+}
+
+void exitGame(Board *realBoard)
+{
+    con_clear();
+    if (realBoard)
+    {
+        free(realBoard);
+    }
+
+    exit(0);
 }
