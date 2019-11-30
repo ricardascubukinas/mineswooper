@@ -557,54 +557,50 @@ int countNearbyMines(Board tempBoard, int coordX, int coordY)
 
 char *selectSaveFile()
 {
-    WIN32_FIND_DATA fdFile;
-    HANDLE hFind = NULL;
-    char sDir[2000];
-
-    char sPath[2048];
+    WIN32_FIND_DATA findFile;
+    HANDLE handleFind = NULL;
+    char searchDir[2000];
+    char searchPath[2048];
 
     while (1)
     {
         printf("Enter a directory name(maximum length is 100) where to look for the save:\n");
-        fgets(sDir, 100, stdin);
-        strtok(sDir, "\n");
-        sprintf(sPath, "%s\\*.bin", sDir);
-        hFind = FindFirstFile(sPath, &fdFile);
-        if ((hFind = FindFirstFile(sPath, &fdFile)) == INVALID_HANDLE_VALUE)
+        fgets(searchDir, 100, stdin);
+        strtok(searchDir, "\n");
+        sprintf(searchPath, "%s\\*.bin", searchDir);
+        handleFind = FindFirstFile(searchPath, &findFile);
+        if ((handleFind = FindFirstFile(searchPath, &findFile)) == INVALID_HANDLE_VALUE)
         {
-            printf("Path not found: [%s]\n", sDir);
-            hFind = NULL;
+            printf("Path not found: [%s]\n", searchDir);
+            handleFind = NULL;
         }
         else
         {
             break;
         }
     }
+
     char **files = (char **)malloc(100 * sizeof(char *));
     for (int i = 0; i < 100; i++)
     {
         files[i] = (char *)malloc(100 * sizeof(char));
     }
     int fileCount = 0;
+
     do
     {
-        //Find first file will always return "."
-        //    and ".." as the first two directories.
-        if (strcmp(fdFile.cFileName, ".") != 0 && strcmp(fdFile.cFileName, "..") != 0)
+        if (strcmp(findFile.cFileName, ".") != 0 && strcmp(findFile.cFileName, "..") != 0)
         {
-            //Build up our file path using the passed in
-            //  [sDir] and the file/foldername we just found:
-            sprintf(sPath, "%s\\%s", sDir, fdFile.cFileName);
-
-            //Is the entity a File or Folder?
-            if (!(fdFile.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+            sprintf(searchPath, "%s\\%s", searchDir, findFile.cFileName);
+            if (!(findFile.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
             {
-                strcpy(files[fileCount], sPath);
+                strcpy(files[fileCount], searchPath);
                 fileCount++;
             }
         }
-    } while (FindNextFile(hFind, &fdFile)); //Find the next file.
-    FindClose(hFind);                       //Always, Always, clean things up!
+    } while (FindNextFile(handleFind, &findFile));
+
+    FindClose(handleFind);
     if (fileCount > 0)
     {
         return files[showMenu("Pick the file to load", files, fileCount, "Pick your option")];
