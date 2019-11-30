@@ -248,7 +248,8 @@ void inGameMenu(Board *realBoard)
         char fileName[1000];
         while (1)
         {
-            printf("Enter a file name(to save in current directoy) or full file's path, don't type in the extension, maximum length 100 characters\n");
+            /* TODO: Implement check for correct file names*/
+            printf("Enter a file name(to save in current directoy), don't type in the extension, maximum length 100 characters\n");
             fileName[0] = '\0';
             fgets(fileName, 1000, stdin);
             strtok(fileName, "\n");
