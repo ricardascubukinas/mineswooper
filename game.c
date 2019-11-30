@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include <time.h>
+#include <time.h.>
 
 #include "con_lib.h"
 
@@ -30,7 +30,6 @@ bool wasPressed[128];
 int showMenu(char *menuTitle, char *menuOptions[], int menuSize, char *inputMsg);
 void menuInstance();
 void gameInstance(Board *realBoard);
-void inGameMenu(Board *realBoard);
 Board *reveal(Board *tempBoard, bool isFirst);
 Board *checkForFails(Board *tempBoard);
 Board *setUpBoard(Board *realBoard, int height, int width, int mines);
@@ -39,12 +38,12 @@ void loseScreen();
 void printBoard(Board tempBoard);
 void showScoreboard();
 int randInt(int low, int high);
-void saveBoard(Board realBoard);
+void saveBoard(Board realBoard, char *fileName);
 Board *loadSave(char *fileName);
 bool checkForKey(int press, int key);
 bool inBounds(int coordX, int coordY, int sizeX, int sizeY);
 int countNearbyMines(Board tempBoard, int x, int y);
-void exitGame(Board *realBoard);
+char *selectSaveFile();
 
 int main()
 {
@@ -54,10 +53,8 @@ int main()
         wasPressed[i] = false;
     }
     wasPressed[13] = true;
-
     menuInstance();
     con_clear();
-
     return 0;
 }
 
@@ -74,8 +71,16 @@ void menuInstance()
     }
     else if (choice == 1)
     {
-        //showMenu("Loading the save", fileNames, n, "Choose a save-file to load");
-        //*realBoard = loadSave(fileName);
+        char *fileName = selectSaveFile();
+        if (fileName == NULL)
+        {
+            menuInstance();
+        }
+        else
+        {
+            realBoard = loadSave(fileName);
+            gameInstance(realBoard);
+        }
 
         return;
     }
@@ -90,7 +95,8 @@ void menuInstance()
     }
     else
     {
-        exitGame(NULL);
+
+        return;
     }
 }
 
@@ -112,7 +118,7 @@ int showMenu(char *menuTitle, char *menuOptions[], int menuSize, char *inputMsg)
     while (1)
     {
         int key = 0;
-        while ((key = con_read_key()))
+        while (key = con_read_key())
         {
             if (checkForKey(key, 'w'))
             {
@@ -141,6 +147,7 @@ int showMenu(char *menuTitle, char *menuOptions[], int menuSize, char *inputMsg)
             fflush(stdout);
         }
     }
+    system("pause");
 }
 
 void gameInstance(Board *realBoard)
@@ -164,7 +171,7 @@ void gameInstance(Board *realBoard)
     while (1)
     {
         int key = 0;
-        while ((key = con_read_key()))
+        while (key = con_read_key())
         {
             if (checkForKey(key, 'w'))
             {
@@ -184,9 +191,55 @@ void gameInstance(Board *realBoard)
             {
                 posX += 3;
             }
+            if (checkForKey(key, 'q'))
+            {
+                return;
+            }
             if (checkForKey(key, 'm'))
             {
-                inGameMenu(realBoard);
+                char *gameMenu[4] = {"Save", "Go back", "Quit to main menu", "Quit game"};
+                int choice = showMenu("In game menu", gameMenu, 4, "Pick your option");
+                if (choice == 0)
+                {
+                    char fileName[1000];
+                    while (1)
+                    {
+                        printf("Enter a file name(to save in current directoy) or full file's path, don't type in the extension, maximum length 100 characters\n");
+                        fileName[0] = '\0';
+                        gets(fileName);
+                        if (strlen(fileName) > 100)
+                        {
+                            printf("Error! File's name length is too long.\n");
+                        }
+                        else if (fileName == NULL || fileName[0] == '\n' || fileName[0] == '\0')
+                        {
+                            printf("You can't enter an empty string\n");
+                        }
+                        else
+                        {
+                            printf("Success! Proceeding to save to file %s.bin.\n", fileName);
+                            break;
+                        }
+                    }
+                    strcat(fileName, ".bin");
+                    saveBoard(*realBoard, fileName);
+                    system("pause");
+                    printBoard(*realBoard);
+                }
+                else if (choice == 1)
+                {
+                    printBoard(*realBoard);
+                }
+                else if (choice == 2)
+                {
+                    menuInstance();
+                    realBoard = NULL;
+                    return;
+                }
+                else
+                {
+                    return;
+                }
             }
             if (posY > realBoard->sizeY - 1)
                 posY = 0;
@@ -222,32 +275,6 @@ void gameInstance(Board *realBoard)
     }
 
     return;
-}
-
-void inGameMenu(Board *realBoard)
-{
-    char *gameMenu[4] = {"Save", "Go back", "Quit to main menu", "Quit game"};
-    int choice = showMenu("In game menu", gameMenu, 4, "Pick your option");
-    if (choice == 0)
-    {
-        saveBoard(*realBoard);
-        system("pause");
-        inGameMenu(realBoard);
-    }
-    else if (choice == 1)
-    {
-        printBoard(*realBoard);
-    }
-    else if (choice == 2)
-    {
-        menuInstance();
-        free(realBoard);
-        return;
-    }
-    else
-    {
-        exitGame(realBoard);
-    }
 }
 
 Board *reveal(Board *tempBoard, bool isFirst)
@@ -432,8 +459,7 @@ void printBoard(Board tempBoard)
         }
         printf("\n");
     }
-    printf("  Controls: w - up, s - down, a - left, d - right, m - open menu\n");
-    printf("  ENTER - reveal selected cell, SHIFT - mark selected cell\n");
+
     return;
 }
 
@@ -449,33 +475,14 @@ void showScoreboard()
     return;
 }
 
-void saveBoard(Board realBoard)
+void saveBoard(Board realBoard, char *fileName)
 {
-    char fileName[1000];
-    while (1)
-    {
-        printf("Enter a file name(to save in current directoy) or full file's path, don't type in the extension, maximum length 100 characters\n");
-        fileName[0] = '\0';
-        fgets(fileName, 1000, stdin);
-        if (strlen(fileName) > 100)
-        {
-            printf("Error! File's name length is too long.\n");
-        }
-        else if (fileName == NULL || fileName[0] == '\n' || fileName[0] == '\0')
-        {
-            printf("You can't enter an empty string\n");
-        }
-        else
-        {
-            strtok(fileName, "\n");
-            printf("Success! Proceeding to save to file '%s.bin'\n", fileName);
-            break;
-        }
-    }
-    strcat(fileName, ".bin");
     FILE *fw = fopen(fileName, "wb");
     fwrite(&realBoard, sizeof(Board), 1, fw);
-
+    for (int i = 0; i < realBoard.sizeY; i++)
+    {
+        fwrite(realBoard.cells[i], sizeof(Cell), realBoard.sizeX, fw);
+    }
     fclose(fw);
 }
 
@@ -486,6 +493,13 @@ Board *loadSave(char *fileName)
 
     if (fread(loadedBoard, sizeof(Board), 1, fr) == 1) // True statement
     {
+        Cell **temp = (Cell **)malloc(loadedBoard->sizeY * sizeof(Cell *));
+        for (int i = 0; i < loadedBoard->sizeY; i++)
+        {
+            temp[i] = (Cell *)malloc(loadedBoard->sizeX * sizeof(Cell));
+            fread(temp[i], sizeof(Cell), loadedBoard->sizeX, fr);
+        }
+        loadedBoard->cells = temp;
         fclose(fr);
         return loadedBoard;
     }
@@ -541,13 +555,62 @@ int countNearbyMines(Board tempBoard, int coordX, int coordY)
     return cellValue;
 }
 
-void exitGame(Board *realBoard)
+char *selectSaveFile()
 {
-    con_clear();
-    if (realBoard)
-    {
-        free(realBoard);
-    }
+    WIN32_FIND_DATA fdFile;
+    HANDLE hFind = NULL;
+    char sDir[2000];
 
-    exit(0);
+    char sPath[2048];
+
+    while (1)
+    {
+        printf("Enter a directory name(maximum length is 100) where to look for the save:\n");
+        fgets(sDir, 100, stdin);
+        strtok(sDir, "\n");
+        sprintf(sPath, "%s\\*.bin", sDir);
+        hFind = FindFirstFile(sPath, &fdFile);
+        if ((hFind = FindFirstFile(sPath, &fdFile)) == INVALID_HANDLE_VALUE)
+        {
+            printf("Path not found: [%s]\n", sDir);
+            hFind = NULL;
+        }
+        else
+        {
+            break;
+        }
+    }
+    char **files = (char **)malloc(100 * sizeof(char *));
+    for (int i = 0; i < 100; i++)
+    {
+        files[i] = (char *)malloc(100 * sizeof(char));
+    }
+    int fileCount = 0;
+    do
+    {
+        //Find first file will always return "."
+        //    and ".." as the first two directories.
+        if (strcmp(fdFile.cFileName, ".") != 0 && strcmp(fdFile.cFileName, "..") != 0)
+        {
+            //Build up our file path using the passed in
+            //  [sDir] and the file/foldername we just found:
+            sprintf(sPath, "%s\\%s", sDir, fdFile.cFileName);
+
+            //Is the entity a File or Folder?
+            if (!(fdFile.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+            {
+                strcpy(files[fileCount], sPath);
+                fileCount++;
+            }
+        }
+    } while (FindNextFile(hFind, &fdFile)); //Find the next file.
+    FindClose(hFind);                       //Always, Always, clean things up!
+    if (fileCount > 0)
+    {
+        return files[showMenu("Pick the file to load", files, fileCount, "Pick your option")];
+    }
+    else
+    {
+        return NULL;
+    }
 }
