@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include <time.h.>
+#include <time.h>
+#include <direct.h>
 
 #include "con_lib.h"
 
@@ -496,26 +497,27 @@ char *selectSaveFile()
 
     while (1)
     {
-        printf("Enter a directory name(maximum length is 100) where to look for the save:\n");
+        printf("Enter a directory name(maximum length is 100) where to look for the save, or press enter to check current directory:\n");
         printf("You can type in /q to go back to the menu\n");
         fgets(searchDir, 100, stdin);
+        if (searchDir[0] == '\n')
+        {
+            getcwd(searchDir, FILENAME_MAX);
+        }
         strtok(searchDir, "\n");
+        if (strcmp(searchDir, "/q") == 0)
+        {
+            menuInstance();
+
+            return NULL;
+        }
         sprintf(searchPath, "%s\\*.bin", searchDir);
         handleFind = FindFirstFile(searchPath, &findFile);
         if ((handleFind = FindFirstFile(searchPath, &findFile)) == INVALID_HANDLE_VALUE)
         {
-            strtok(searchDir, "\n");
-            if (strcmp(searchDir, "/q") == 0)
-            {
-                menuInstance();
 
-                return NULL;
-            }
-            else
-            {
-                printf("Path not found: [%s]\n", searchDir);
-                handleFind = NULL;
-            }
+            printf("Path not found: [%s] or no .bin files in directory\n", searchDir);
+            handleFind = NULL;
         }
         else
         {
