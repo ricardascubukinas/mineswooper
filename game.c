@@ -35,7 +35,6 @@ void inGameMenu(Board *realBoard);
 Board *reveal(Board *tempBoard, bool isFirst);
 Board *checkForFails(Board *tempBoard);
 Board *setUpBoard(Board *realBoard, int height, int width, int mines);
-Board *setUpSampleBoard();
 void loseScreen();
 void winScreen();
 void printBoard(Board tempBoard);
@@ -436,44 +435,6 @@ Board *setUpBoard(Board *realBoard, int height, int width, int mines)
     return realBoard;
 }
 
-Board *setUpSampleBoard()
-{
-    Board *realBoard = malloc(sizeof(Board));
-    realBoard->mineCount = 1;
-    realBoard->sizeX = 6;
-    realBoard->sizeY = 6;
-    realBoard->cursorX = realBoard->sizeX / 2;
-    realBoard->cursorY = realBoard->sizeY / 2;
-    Cell **temp = (Cell **)malloc(realBoard->sizeY * sizeof(Cell *));
-    for (int i = 0; i < realBoard->sizeY; i++)
-    {
-        temp[i] = (Cell *)malloc(realBoard->sizeX * sizeof(Cell));
-    }
-    realBoard->cells = temp;
-    for (int i = 0; i < realBoard->sizeY; i++)
-    {
-        for (int j = 0; j < realBoard->sizeX; j++)
-        {
-            realBoard->cells[i][j].isMined = false;
-            realBoard->cells[i][j].isRevealed = false;
-            realBoard->cells[i][j].isMarked = false;
-        }
-    }
-    realBoard->cells[4][5].isMined = true;
-    realBoard->cells[4][5].cellValue = -1;
-    for (int i = 0; i < realBoard->sizeY; i++)
-    {
-        for (int j = 0; j < realBoard->sizeX; j++)
-        {
-            if (!realBoard->cells[i][j].isMined)
-            {
-                realBoard->cells[i][j].cellValue = countNearbyMines(*realBoard, i, j);
-            }
-        }
-    }
-    return realBoard;
-}
-
 void loseScreen()
 {
     con_clear();
@@ -516,6 +477,8 @@ void printBoard(Board tempBoard)
         }
         printf("\n");
     }
+    printf("  Controls: w - up, s - down, a - left, d - right\n");
+    printf("  ENTER - reveal a cell, SPACE - mark a cell, m - open menu\n");
 
     return;
 }
