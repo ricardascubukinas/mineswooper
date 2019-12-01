@@ -1,0 +1,14 @@
+#ifndef END_H
+#define END_H
+
+#include "board.h"
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+bool hasWon(Board tempBoard);
+void loseScreen();
+void winScreen();
+void exitGame(Board *realBoard);
+
+#endif

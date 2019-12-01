@@ -13,23 +13,11 @@
 #include <direct.h>
 
 #include "con_lib.h"
+#include "end.h"
+#include "board.h"
 
 #define BOARD_SIZE 6
 #define MINE_COUNT 1
-
-typedef struct Cell
-{
-    bool isMined, isRevealed, isMarked;
-    int cellValue;
-} Cell;
-
-typedef struct Board
-{
-    int mineCount;
-    int sizeX, sizeY;
-    int cursorX, cursorY;
-    Cell **cells;
-} Board;
 
 int areaX[9] = {0, -1, 0, 1, 1, 1, 0, -1, -1};
 int areaY[9] = {0, -1, -1, -1, 0, 1, 1, 1, 0};
@@ -43,8 +31,6 @@ void inGameMenu(Board *realBoard, int markedCount);
 Board *reveal(Board *tempBoard, bool isFirst);
 Board *checkForFails(Board *tempBoard);
 Board *setUpBoard(Board *realBoard, int height, int width, int mines);
-void loseScreen();
-void winScreen();
 void printBoard(Board tempBoard, int markedCount);
 void showScoreboard();
 int randInt(int low, int high);
@@ -55,8 +41,6 @@ bool checkForKey(int press, int key);
 bool inBounds(int coordX, int coordY, int sizeX, int sizeY);
 int countNearbyMines(Board tempBoard, int x, int y);
 int countUnrevealedCells(Board tempBoard);
-void exitGame(Board *realBoard);
-bool hasWon(Board tempBoard);
 
 int main()
 {
@@ -183,6 +167,8 @@ void gameInstance(Board *realBoard)
         {
             realBoard = setUpBoard(realBoard, 24, 24, 99);
         }
+        //saveBoard(*realBoard, "save.bin");
+        //realBoard = loadSave("save.bin");
     }
     int posX = 2, posY = 0, markedCount = 0;
     printBoard(*realBoard, markedCount);
@@ -449,26 +435,6 @@ Board *setUpBoard(Board *realBoard, int height, int width, int mines)
     return realBoard;
 }
 
-void loseScreen()
-{
-    con_clear();
-    printf("You've lost\n");
-    system("pause");
-    menuInstance();
-
-    exitGame(NULL);
-}
-
-void winScreen()
-{
-    con_clear();
-    printf("You've won\n");
-    system("pause");
-    menuInstance();
-
-    exitGame(NULL);
-}
-
 void printBoard(Board tempBoard, int markedCount)
 {
     con_clear();
@@ -673,37 +639,4 @@ int countUnrevealedCells(Board tempBoard)
     }
 
     return unrevealedCount;
-}
-
-bool hasWon(Board tempBoard)
-{
-    int unrevealedCount = countUnrevealedCells(tempBoard), markedCorrectCount = 0;
-    for (int i = 0; i < tempBoard.sizeY; i++)
-    {
-        for (int j = 0; j < tempBoard.sizeX; j++)
-        {
-            if (tempBoard.cells[i][j].isMarked && tempBoard.cells[i][j].isMined)
-            {
-                markedCorrectCount++;
-            }
-        }
-    }
-    if (unrevealedCount == tempBoard.mineCount || markedCorrectCount == tempBoard.mineCount)
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
-
-void exitGame(Board *realBoard)
-{
-    con_clear();
-    if (!realBoard)
-    {
-        free(realBoard);
-    }
-    exit(0);
 }
