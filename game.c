@@ -1,3 +1,11 @@
+/** 
+ * Project's goal: A minesweeper implementation
+ * Author: Ričardas Čubukinas
+ * Requires con_lib.h
+ * 
+ * 
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -160,15 +168,20 @@ void gameInstance(Board *realBoard)
     if (realBoard == NULL)
     {
         //realBoard = setUpSampleBoard();
-        realBoard = setUpBoard(realBoard, BOARD_SIZE, BOARD_SIZE, MINE_COUNT);
-        //saveBoard(*realBoard, "save.bin");
-        //realBoard = loadSave("save.bin");
-        if (realBoard == NULL)
+        char *difficultyMenu[] = {"Easy", "Normal", "Hard"};
+        int choice = showMenu("Select a difficulty", difficultyMenu, 3, "Pick your option");
+        int width, height, mineCount;
+        if (choice == 0)
         {
-            printf("Save-file was corrupted\n");
+            realBoard = setUpBoard(realBoard, 10, 10, 10);
+        }
+        else if (choice == 1)
+        {
+            realBoard = setUpBoard(realBoard, 15, 15, 30);
         }
         else
         {
+            realBoard = setUpBoard(realBoard, 24, 24, 99);
         }
     }
     int posX = 2, posY = 0, markedCount = 0;
