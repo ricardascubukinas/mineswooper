@@ -11,6 +11,7 @@
 #include <stdbool.h>
 #include <time.h>
 #include <direct.h>
+#include <windows.h>
 
 #include "con_lib.h"
 #include "end.h"

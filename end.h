@@ -1,6 +1,7 @@
 #ifndef END_H
 #define END_H
 
+#include "con_lib.h"
 #include "board.h"
 #include <stdbool.h>
 #include <stdio.h>
