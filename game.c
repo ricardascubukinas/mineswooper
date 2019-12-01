@@ -31,13 +31,13 @@ bool wasPressed[128];
 int showMenu(char *menuTitle, char *menuOptions[], int menuSize, char *inputMsg);
 void menuInstance();
 void gameInstance(Board *realBoard);
-void inGameMenu(Board *realBoard);
+void inGameMenu(Board *realBoard, int markedCount);
 Board *reveal(Board *tempBoard, bool isFirst);
 Board *checkForFails(Board *tempBoard);
 Board *setUpBoard(Board *realBoard, int height, int width, int mines);
 void loseScreen();
 void winScreen();
-void printBoard(Board tempBoard);
+void printBoard(Board tempBoard, int markedCount);
 void showScoreboard();
 int randInt(int low, int high);
 void saveBoard(Board realBoard, char *fileName);
@@ -171,8 +171,9 @@ void gameInstance(Board *realBoard)
         {
         }
     }
-    printBoard(*realBoard);
     int posX = 2, posY = 0, markedCount = 0;
+    printBoard(*realBoard, markedCount);
+
     while (1)
     {
         int key = 0;
@@ -202,7 +203,7 @@ void gameInstance(Board *realBoard)
             }
             if (checkForKey(key, 'm'))
             {
-                inGameMenu(realBoard);
+                inGameMenu(realBoard, markedCount);
             }
             if (posY > realBoard->sizeY - 1)
                 posY = 0;
@@ -234,7 +235,7 @@ void gameInstance(Board *realBoard)
                     }
                     else
                     {
-                        printBoard(*realBoard);
+                        printBoard(*realBoard, markedCount);
                     }
                 }
             }
@@ -257,7 +258,7 @@ void gameInstance(Board *realBoard)
                 }
                 else
                 {
-                    printBoard(*realBoard);
+                    printBoard(*realBoard, markedCount);
                 }
             }
 
@@ -270,7 +271,7 @@ void gameInstance(Board *realBoard)
     return;
 }
 
-void inGameMenu(Board *realBoard)
+void inGameMenu(Board *realBoard, int markedCount)
 {
     char *gameMenu[4] = {"Save", "Go back", "Quit to main menu", "Quit game"};
     int choice = showMenu("In game menu", gameMenu, 4, "Pick your option");
@@ -301,11 +302,11 @@ void inGameMenu(Board *realBoard)
         strcat(fileName, ".bin");
         saveBoard(*realBoard, fileName);
         system("pause");
-        printBoard(*realBoard);
+        printBoard(*realBoard, markedCount);
     }
     else if (choice == 1)
     {
-        printBoard(*realBoard);
+        printBoard(*realBoard, markedCount);
     }
     else if (choice == 2)
     {
@@ -455,7 +456,7 @@ void winScreen()
     exitGame(NULL);
 }
 
-void printBoard(Board tempBoard)
+void printBoard(Board tempBoard, int markedCount)
 {
     con_clear();
     for (int i = 0; i < tempBoard.sizeY; i++)
@@ -477,6 +478,7 @@ void printBoard(Board tempBoard)
         }
         printf("\n");
     }
+    printf("  Mines left: %i\n", tempBoard.mineCount - markedCount);
     printf("  Controls: w - up, s - down, a - left, d - right\n");
     printf("  ENTER - reveal a cell, SPACE - mark a cell, m - open menu\n");
 
