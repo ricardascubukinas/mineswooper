@@ -37,6 +37,7 @@ Board *checkForFails(Board *tempBoard);
 Board *setUpBoard(Board *realBoard, int height, int width, int mines);
 Board *setUpSampleBoard();
 void loseScreen();
+void winScreen();
 void printBoard(Board tempBoard);
 void showScoreboard();
 int randInt(int low, int high);
@@ -46,7 +47,9 @@ Board *loadSave(char *fileName);
 bool checkForKey(int press, int key);
 bool inBounds(int coordX, int coordY, int sizeX, int sizeY);
 int countNearbyMines(Board tempBoard, int x, int y);
+int countUnrevealedCells(Board tempBoard);
 void exitGame(Board *realBoard);
+bool hasWon(Board tempBoard);
 
 int main()
 {
@@ -55,7 +58,6 @@ int main()
     {
         wasPressed[i] = false;
     }
-    wasPressed[13] = true;
 
     menuInstance();
 
@@ -108,7 +110,7 @@ void menuInstance()
 int showMenu(char *menuTitle, char *menuOptions[], int menuSize, char *inputMsg)
 {
     con_clear();
-
+    wasPressed[13] = true;
     int posY = 1;
     printf("%s\n", menuTitle);
     for (int i = 0; i < menuSize; i++)
@@ -152,7 +154,6 @@ int showMenu(char *menuTitle, char *menuOptions[], int menuSize, char *inputMsg)
             fflush(stdout);
         }
     }
-    system("pause");
 }
 
 void gameInstance(Board *realBoard)
@@ -172,7 +173,7 @@ void gameInstance(Board *realBoard)
         }
     }
     printBoard(*realBoard);
-    int posX = 2, posY = 0;
+    int posX = 2, posY = 0, markedCount = 0;
     while (1)
     {
         int key = 0;
@@ -223,6 +224,36 @@ void gameInstance(Board *realBoard)
                 if (realBoard == NULL)
                 {
                     loseScreen();
+                    return;
+                }
+                else
+                {
+                    if (hasWon(*realBoard))
+                    {
+                        winScreen();
+                        return;
+                    }
+                    else
+                    {
+                        printBoard(*realBoard);
+                    }
+                }
+            }
+            if (checkForKey(key, 32))
+            {
+                if (realBoard->cells[realBoard->cursorY][realBoard->cursorX].isMarked)
+                {
+                    realBoard->cells[realBoard->cursorY][realBoard->cursorX].isMarked = false;
+                    markedCount--;
+                }
+                else if ((!realBoard->cells[realBoard->cursorY][realBoard->cursorX].isMarked && !realBoard->cells[realBoard->cursorY][realBoard->cursorX].isRevealed) && markedCount < realBoard->mineCount)
+                {
+                    realBoard->cells[realBoard->cursorY][realBoard->cursorX].isMarked = true;
+                    markedCount++;
+                }
+                if (hasWon(*realBoard))
+                {
+                    winScreen();
                     return;
                 }
                 else
@@ -307,7 +338,7 @@ Board *reveal(Board *tempBoard, bool isFirst)
                 coordY = areaY[i] + tempBoard->cursorY;
                 if (inBounds(coordX, coordY, tempBoard->sizeX, tempBoard->sizeY))
                 {
-                    if (!tempBoard->cells[coordY][coordX].isRevealed && !tempBoard->cells[coordY][coordX].isMined)
+                    if (!tempBoard->cells[coordY][coordX].isRevealed && !tempBoard->cells[coordY][coordX].isMined && !tempBoard->cells[coordY][coordX].isMarked)
                     {
                         tempBoard->cells[coordY][coordX].isRevealed = true;
                         if (tempBoard->cells[coordY][coordX].cellValue == 0 && i != 0)
@@ -336,7 +367,7 @@ Board *checkForFails(Board *tempBoard)
     {
         for (int j = 0; j < tempBoard->sizeX; j++)
         {
-            if (!tempBoard->cells[i][j].isRevealed)
+            if (!tempBoard->cells[i][j].isRevealed && !tempBoard->cells[i][j].isMarked)
             {
                 for (int k = 0; k < 9; k++)
                 {
@@ -445,9 +476,22 @@ Board *setUpSampleBoard()
 
 void loseScreen()
 {
+    con_clear();
     printf("You've lost\n");
     system("pause");
     menuInstance();
+
+    exitGame(NULL);
+}
+
+void winScreen()
+{
+    con_clear();
+    printf("You've won\n");
+    system("pause");
+    menuInstance();
+
+    exitGame(NULL);
 }
 
 void printBoard(Board tempBoard)
@@ -457,7 +501,7 @@ void printBoard(Board tempBoard)
     {
         for (int j = 0; j < tempBoard.sizeX; j++)
         {
-            if (!tempBoard.cells[i][j].isRevealed || tempBoard.cells[i][j].isMined)
+            if ((!tempBoard.cells[i][j].isRevealed || tempBoard.cells[i][j].isMined) && !tempBoard.cells[i][j].isMarked)
             {
                 printf("%3c", '#');
             }
@@ -634,6 +678,46 @@ int countNearbyMines(Board tempBoard, int coordX, int coordY)
     }
 
     return cellValue;
+}
+
+int countUnrevealedCells(Board tempBoard)
+{
+    int unrevealedCount = 0;
+    for (int i = 0; i < tempBoard.sizeY; i++)
+    {
+        for (int j = 0; j < tempBoard.sizeX; j++)
+        {
+            if (!tempBoard.cells[i][j].isRevealed)
+            {
+                unrevealedCount++;
+            }
+        }
+    }
+
+    return unrevealedCount;
+}
+
+bool hasWon(Board tempBoard)
+{
+    int unrevealedCount = countUnrevealedCells(tempBoard), markedCorrectCount = 0;
+    for (int i = 0; i < tempBoard.sizeY; i++)
+    {
+        for (int j = 0; j < tempBoard.sizeX; j++)
+        {
+            if (tempBoard.cells[i][j].isMarked && tempBoard.cells[i][j].isMined)
+            {
+                markedCorrectCount++;
+            }
+        }
+    }
+    if (unrevealedCount == tempBoard.mineCount || markedCorrectCount == tempBoard.mineCount)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 void exitGame(Board *realBoard)
