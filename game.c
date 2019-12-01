@@ -36,7 +36,7 @@ void printBoard(Board tempBoard, int markedCount);
 void showScoreboard();
 int randInt(int low, int high);
 void saveBoard(Board realBoard, char *fileName);
-char *selectSaveFile();
+char *selectLoadFile();
 Board *loadSave(char *fileName);
 bool checkForKey(int press, int key);
 bool inBounds(int coordX, int coordY, int sizeX, int sizeY);
@@ -70,7 +70,7 @@ void menuInstance()
     }
     else if (choice == 1)
     {
-        char *fileName = selectSaveFile();
+        char *fileName = selectLoadFile();
         if (fileName == NULL)
         {
             menuInstance();
@@ -219,34 +219,36 @@ void gameInstance(Board *realBoard)
             realBoard->cursorY = posY;
             if (checkForKey(key, 13))
             {
-                con_clear();
-                realBoard = reveal(realBoard, true);
-                if (realBoard == NULL)
+                if (!realBoard->cells[realBoard->cursorY][realBoard->cursorX].isRevealed)
                 {
-                    loseScreen();
-                    return;
-                }
-                else
-                {
-                    if (hasWon(*realBoard))
+                    realBoard = reveal(realBoard, true);
+                    if (realBoard == NULL)
                     {
-                        winScreen();
+                        loseScreen();
                         return;
                     }
                     else
                     {
-                        printBoard(*realBoard, markedCount);
+                        if (hasWon(*realBoard))
+                        {
+                            winScreen();
+                            return;
+                        }
+                        else
+                        {
+                            printBoard(*realBoard, markedCount);
+                        }
                     }
                 }
             }
-            if (checkForKey(key, 32))
+            if (checkForKey(key, 32) && !realBoard->cells[realBoard->cursorY][realBoard->cursorX].isRevealed)
             {
                 if (realBoard->cells[realBoard->cursorY][realBoard->cursorX].isMarked)
                 {
                     realBoard->cells[realBoard->cursorY][realBoard->cursorX].isMarked = false;
                     markedCount--;
                 }
-                else if ((!realBoard->cells[realBoard->cursorY][realBoard->cursorX].isMarked && !realBoard->cells[realBoard->cursorY][realBoard->cursorX].isRevealed) && markedCount < realBoard->mineCount)
+                else if (!realBoard->cells[realBoard->cursorY][realBoard->cursorX].isMarked && markedCount < realBoard->mineCount)
                 {
                     realBoard->cells[realBoard->cursorY][realBoard->cursorX].isMarked = true;
                     markedCount++;
@@ -477,7 +479,7 @@ void showScoreboard()
     return;
 }
 
-char *selectSaveFile()
+char *selectLoadFile()
 {
     WIN32_FIND_DATA findFile;
     HANDLE handleFind = NULL;
