@@ -8,7 +8,7 @@
 
 #include "con_lib.h"
 #include "board.h"
-#include "menu.h"
+#include "instance.h"
 
 char *selectSaveFile();
 char *selectLoadFile();
