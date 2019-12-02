@@ -14,9 +14,9 @@
 
 bool wasPressed[128];
 int showMenu(char *menuTitle, char *menuOptions[], int menuSize, char *inputMsg);
-void menuInstance();
-void inGameMenu(Board *realBoard, int markedCount);
+void mainMenuInstance();
+void inGameMenuInstance(Board *realBoard, int markedCount);
 void gameInstance(Board *realBoard);
-void showScoreboard();
+void scoreboardInstance();
 
 #endif

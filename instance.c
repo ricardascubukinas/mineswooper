@@ -51,7 +51,7 @@ int showMenu(char *menuTitle, char *menuOptions[], int menuSize, char *inputMsg)
     }
 }
 
-void menuInstance()
+void mainMenuInstance()
 {
     Board *realBoard = NULL;
     char *menuOptions[4] = {"New Game", "Load Save", "Show Scoreboard", "Quit"};
@@ -67,7 +67,7 @@ void menuInstance()
         char *fileName = selectLoadFile();
         if (fileName == NULL)
         {
-            menuInstance();
+            mainMenuInstance();
         }
         else
         {
@@ -79,10 +79,10 @@ void menuInstance()
     }
     else if (choice == 2)
     {
-        showScoreboard();
+        scoreboardInstance();
         char *menuScoreboard[1] = {"Go back"};
         showMenu("Welcome to the scoreboard", menuScoreboard, 1, "Pick what you want to do");
-        menuInstance();
+        mainMenuInstance();
 
         exitGame(realBoard);
     }
@@ -93,7 +93,7 @@ void menuInstance()
     }
 }
 
-void inGameMenu(Board *realBoard, int markedCount)
+void inGameMenuInstance(Board *realBoard, int markedCount)
 {
     char *gameMenu[4] = {"Save", "Go back", "Quit to main menu", "Quit game"};
     int choice = showMenu("In game menu", gameMenu, 4, "Pick your option");
@@ -109,7 +109,7 @@ void inGameMenu(Board *realBoard, int markedCount)
     }
     else if (choice == 2)
     {
-        menuInstance();
+        mainMenuInstance();
         exitGame(realBoard);
     }
     else
@@ -175,7 +175,7 @@ void gameInstance(Board *realBoard)
             }
             if (checkForKey(key, 'm'))
             {
-                inGameMenu(realBoard, markedCount);
+                inGameMenuInstance(realBoard, markedCount);
             }
             if (posY > realBoard->sizeY - 1)
                 posY = 0;
@@ -245,7 +245,7 @@ void gameInstance(Board *realBoard)
     return;
 }
 
-void showScoreboard()
+void scoreboardInstance()
 {
     /* Not implemented yet */
 

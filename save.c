@@ -47,7 +47,7 @@ char *selectLoadFile()
         strtok(searchDir, "\n");
         if (strcmp(searchDir, "/q") == 0)
         {
-            menuInstance();
+            mainMenuInstance();
 
             return NULL;
         }

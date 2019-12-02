@@ -1,7 +1,7 @@
 /** 
  * Project's goal: A minesweeper implementation
  * Author: Ričardas Čubukinas
- * Requires con_lib.h
+ * Requires game_logic.h, con_lib.h, end.h, instance.h, board.h, save.h, utility.h
  * 
  * 
 */
@@ -13,6 +13,7 @@
 #include <direct.h>
 #include <windows.h>
 
+#include "game_logic.h"
 #include "con_lib.h"
 #include "end.h"
 #include "instance.h"
@@ -22,10 +23,8 @@
 
 int main()
 {
-
     setUpVariables();
-    menuInstance();
+    mainMenuInstance();
 
-    con_clear();
-    return 0;
+    exitGame(NULL);
 }
