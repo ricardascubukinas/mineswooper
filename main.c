@@ -15,7 +15,9 @@
 
 #include "con_lib.h"
 #include "end.h"
+#include "menu.h"
 #include "board.h"
+#include "save.h"
 
 #define BOARD_SIZE 6
 #define MINE_COUNT 1
@@ -23,25 +25,18 @@
 int areaX[9] = {0, -1, 0, 1, 1, 1, 0, -1, -1};
 int areaY[9] = {0, -1, -1, -1, 0, 1, 1, 1, 0};
 
-bool wasPressed[128];
-
-int showMenu(char *menuTitle, char *menuOptions[], int menuSize, char *inputMsg);
-void menuInstance();
 void gameInstance(Board *realBoard);
-void inGameMenu(Board *realBoard, int markedCount);
 Board *reveal(Board *tempBoard, bool isFirst);
 Board *checkForFails(Board *tempBoard);
 Board *setUpBoard(Board *realBoard, int height, int width, int mines);
 void printBoard(Board tempBoard, int markedCount);
 void showScoreboard();
 int randInt(int low, int high);
-void saveBoard(Board realBoard, char *fileName);
-char *selectLoadFile();
-Board *loadSave(char *fileName);
-bool checkForKey(int press, int key);
-bool inBounds(int coordX, int coordY, int sizeX, int sizeY);
-int countNearbyMines(Board tempBoard, int x, int y);
+
 int countUnrevealedCells(Board tempBoard);
+int countNearbyMines(Board tempBoard, int coordX, int coordY);
+bool inBounds(int coordX, int coordY, int sizeX, int sizeY);
+bool checkForKey(int press, int key);
 
 int main()
 {
@@ -55,97 +50,6 @@ int main()
 
     con_clear();
     return 0;
-}
-
-void menuInstance()
-{
-    Board *realBoard = NULL;
-    char *menuOptions[4] = {"New Game", "Load Save", "Show Scoreboard", "Quit"};
-    int choice = showMenu("Welcome to Minesweeper", menuOptions, 4, "Pick what you want to do");
-    if (choice == 0)
-    {
-        gameInstance(realBoard);
-
-        exitGame(realBoard);
-    }
-    else if (choice == 1)
-    {
-        char *fileName = selectLoadFile();
-        if (fileName == NULL)
-        {
-            menuInstance();
-        }
-        else
-        {
-            realBoard = loadSave(fileName);
-            gameInstance(realBoard);
-        }
-
-        return;
-    }
-    else if (choice == 2)
-    {
-        showScoreboard();
-        char *menuScoreboard[1] = {"Go back"};
-        showMenu("Welcome to the scoreboard", menuScoreboard, 1, "Pick what you want to do");
-        menuInstance();
-
-        exitGame(realBoard);
-    }
-    else
-    {
-
-        exitGame(realBoard);
-    }
-}
-
-int showMenu(char *menuTitle, char *menuOptions[], int menuSize, char *inputMsg)
-{
-    con_clear();
-    wasPressed[13] = true;
-    int posY = 1;
-    printf("%s\n", menuTitle);
-    for (int i = 0; i < menuSize; i++)
-    {
-        printf("%i. %s\n", i, menuOptions[i]);
-    }
-    printf("%s\n", inputMsg);
-    printf("Controls: w - up, s - down\n");
-    con_set_color(COLOR_BLACK, COLOR_GRAY);
-    con_set_pos(0, posY);
-    fflush(stdout);
-    while (1)
-    {
-        int key = 0;
-        while (key = con_read_key())
-        {
-            if (checkForKey(key, 'w'))
-            {
-                posY--;
-            }
-
-            if (checkForKey(key, 's'))
-            {
-                posY++;
-            }
-
-            if (posY > menuSize)
-                posY = 1;
-            if (posY < 1)
-                posY = menuSize;
-
-            if (checkForKey(key, 13))
-            {
-                con_clear();
-
-                return posY - 1;
-            }
-
-            con_set_color(COLOR_BLACK, COLOR_GRAY);
-            con_set_pos(0, posY);
-            fflush(stdout);
-        }
-    }
 }
 
 void gameInstance(Board *realBoard)
@@ -169,7 +73,7 @@ void gameInstance(Board *realBoard)
             realBoard = setUpBoard(realBoard, 24, 24, 99);
         }
         //saveBoard(*realBoard, "save.bin");
-        //realBoard = loadSave("save.bin");
+        //realBoard = loadBoard("save.bin");
     }
     int posX = 2, posY = 0, markedCount = 0;
     printBoard(*realBoard, markedCount);
@@ -268,56 +172,6 @@ void gameInstance(Board *realBoard)
             con_set_pos(posX, posY);
             fflush(stdout);
         }
-    }
-
-    return;
-}
-
-void inGameMenu(Board *realBoard, int markedCount)
-{
-    char *gameMenu[4] = {"Save", "Go back", "Quit to main menu", "Quit game"};
-    int choice = showMenu("In game menu", gameMenu, 4, "Pick your option");
-    if (choice == 0)
-    {
-        char fileName[1000];
-        while (1)
-        {
-            /* TODO: Implement check for correct file names*/
-            printf("Enter a file name(to save in current directoy), don't type in the extension, maximum length 100 characters\n");
-            fileName[0] = '\0';
-            fgets(fileName, 1000, stdin);
-            strtok(fileName, "\n");
-            if (strlen(fileName) > 100)
-            {
-                printf("Error! File's name length is too long.\n");
-            }
-            else if (fileName == NULL || fileName[0] == '\n' || fileName[0] == '\0')
-            {
-                printf("You can't enter an empty string\n");
-            }
-            else
-            {
-                printf("Success! Proceeding to save to file %s.bin.\n", fileName);
-                break;
-            }
-        }
-        strcat(fileName, ".bin");
-        saveBoard(*realBoard, fileName);
-        system("pause");
-        printBoard(*realBoard, markedCount);
-    }
-    else if (choice == 1)
-    {
-        printBoard(*realBoard, markedCount);
-    }
-    else if (choice == 2)
-    {
-        menuInstance();
-        exitGame(realBoard);
-    }
-    else
-    {
-        exitGame(realBoard);
     }
 
     return;
@@ -477,109 +331,6 @@ void showScoreboard()
     /* Not implemented yet */
 
     return;
-}
-
-char *selectLoadFile()
-{
-    WIN32_FIND_DATA findFile;
-    HANDLE handleFind = NULL;
-    char searchDir[2000];
-    char searchPath[2048];
-
-    while (1)
-    {
-        printf("Enter a directory name(maximum length is 100) where to look for the save, or press enter to check current directory:\n");
-        printf("You can type in /q to go back to the menu\n");
-        fgets(searchDir, 100, stdin);
-        if (searchDir[0] == '\n')
-        {
-            getcwd(searchDir, FILENAME_MAX);
-        }
-        strtok(searchDir, "\n");
-        if (strcmp(searchDir, "/q") == 0)
-        {
-            menuInstance();
-
-            return NULL;
-        }
-        sprintf(searchPath, "%s\\*.bin", searchDir);
-        handleFind = FindFirstFile(searchPath, &findFile);
-        if ((handleFind = FindFirstFile(searchPath, &findFile)) == INVALID_HANDLE_VALUE)
-        {
-
-            printf("Path not found: [%s] or no .bin files in directory\n", searchDir);
-            handleFind = NULL;
-        }
-        else
-        {
-            break;
-        }
-    }
-
-    char **files = (char **)malloc(100 * sizeof(char *));
-    for (int i = 0; i < 100; i++)
-    {
-        files[i] = (char *)malloc(100 * sizeof(char));
-    }
-    int fileCount = 0;
-
-    do
-    {
-        if (strcmp(findFile.cFileName, ".") != 0 && strcmp(findFile.cFileName, "..") != 0)
-        {
-            sprintf(searchPath, "%s\\%s", searchDir, findFile.cFileName);
-            if (!(findFile.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
-            {
-                strcpy(files[fileCount], searchPath);
-                fileCount++;
-            }
-        }
-    } while (FindNextFile(handleFind, &findFile));
-
-    FindClose(handleFind);
-    if (fileCount > 0)
-    {
-        return files[showMenu("Pick the file to load", files, fileCount, "Pick your option")];
-    }
-    else
-    {
-        return NULL;
-    }
-}
-
-void saveBoard(Board realBoard, char *fileName)
-{
-    FILE *fw = fopen(fileName, "wb");
-    fwrite(&realBoard, sizeof(Board), 1, fw);
-    for (int i = 0; i < realBoard.sizeY; i++)
-    {
-        fwrite(realBoard.cells[i], sizeof(Cell), realBoard.sizeX, fw);
-    }
-    fclose(fw);
-}
-
-Board *loadSave(char *fileName)
-{
-    Board *loadedBoard = malloc(sizeof(Board));
-    FILE *fr = fopen(fileName, "rb");
-
-    if (fread(loadedBoard, sizeof(Board), 1, fr) == 1) // True statement
-    {
-        //Cell **temp = (Cell **)malloc(loadedBoard->sizeY * sizeof(Cell *));
-        loadedBoard->cells = (Cell **)malloc(loadedBoard->sizeY * sizeof(Cell *));
-        for (int i = 0; i < loadedBoard->sizeY; i++)
-        {
-            loadedBoard->cells[i] = (Cell *)malloc(loadedBoard->sizeX * sizeof(Cell));
-            fread(loadedBoard->cells[i], sizeof(Cell), loadedBoard->sizeX, fr);
-        }
-        fclose(fr);
-        return loadedBoard;
-    }
-    else
-    {
-        fclose(fr);
-        return NULL;
-    }
 }
 
 bool checkForKey(int press, int key)

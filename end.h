@@ -3,6 +3,7 @@
 
 #include "con_lib.h"
 #include "board.h"
+#include "menu.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
