@@ -6,7 +6,7 @@
 #include <string.h>
 
 #include "board.h"
-#include "end.h"
+#include "game_logic.h"
 #include "con_lib.h"
 #include "save.h"
 #include "utility.h"

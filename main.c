@@ -15,7 +15,6 @@
 
 #include "game_logic.h"
 #include "con_lib.h"
-#include "end.h"
 #include "instance.h"
 #include "board.h"
 #include "save.h"

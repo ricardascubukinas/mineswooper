@@ -9,7 +9,6 @@ int areaY[9];
 #include <time.h>
 
 #include "board.h"
-#include "end.h"
 #include "con_lib.h"
 #include "save.h"
 
