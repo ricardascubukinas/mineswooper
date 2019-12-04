@@ -1,3 +1,11 @@
+/** 
+ * Project's goal: A minesweeper implementation
+ * Author: Ričardas Čubukinas
+ * Requires game_logic.h, con_lib.h, end.h, instance.h, board.h, save.h, utility.h
+ * 
+ * 
+*/
+
 #include "utility.h"
 
 int areaX[9] = {0, -1, 0, 1, 1, 1, 0, -1, -1};
