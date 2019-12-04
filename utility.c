@@ -52,8 +52,10 @@ void printBoard(Board tempBoard, int markedCount)
             }
             else if (tempBoard.cells[i][j].isMarked)
             {
+                con_set_color(COLOR_BLACK, COLOR_CYAN);
                 printf("%3c", '*');
             }
+            con_set_color(COLOR_BLACK, COLOR_GRAY);
         }
         printf("\n");
     }

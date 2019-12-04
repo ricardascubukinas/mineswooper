@@ -29,8 +29,6 @@ void loseScreen()
     printf("You've lost\n");
     system("pause");
     mainMenuInstance();
-
-    exitGame(NULL);
 }
 
 void winScreen()
@@ -39,8 +37,6 @@ void winScreen()
     printf("You've won\n");
     system("pause");
     mainMenuInstance();
-
-    exitGame(NULL);
 }
 
 void exitGame(Board *realBoard)

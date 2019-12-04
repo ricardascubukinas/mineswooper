@@ -53,44 +53,40 @@ int showMenu(char *menuTitle, char *menuOptions[], int menuSize, char *inputMsg)
 
 void mainMenuInstance()
 {
+    int choice;
     Board *realBoard = NULL;
-    char *menuOptions[4] = {"New Game", "Load Save", "Show Scoreboard", "Quit"};
-    int choice = showMenu("Welcome to Minesweeper", menuOptions, 4, "Pick what you want to do");
-    if (choice == 0)
+    while (1)
     {
-        gameInstance(realBoard);
 
-        exitGame(realBoard);
-    }
-    else if (choice == 1)
-    {
-        char *fileName = selectLoadFile();
-        if (fileName == NULL)
+        char *menuOptions[4] = {"New Game", "Load Save", "Show Scoreboard", "Quit"};
+        choice = showMenu("Welcome to Minesweeper", menuOptions, 4, "Pick what you want to do");
+        if (choice == 0)
         {
-            mainMenuInstance();
+            break;
+        }
+        else if (choice == 1)
+        {
+            char *fileName = selectLoadFile();
+            if (fileName != NULL)
+            {
+                realBoard = loadBoard(fileName);
+                break;
+            }
+        }
+        else if (choice == 2)
+        {
+            scoreboardInstance();
+            char *menuScoreboard[1] = {"Go back"};
+            showMenu("Welcome to the scoreboard", menuScoreboard, 1, "Pick what you want to do");
         }
         else
         {
-            realBoard = loadBoard(fileName);
-            gameInstance(realBoard);
+            return;
         }
-
-        return;
     }
-    else if (choice == 2)
-    {
-        scoreboardInstance();
-        char *menuScoreboard[1] = {"Go back"};
-        showMenu("Welcome to the scoreboard", menuScoreboard, 1, "Pick what you want to do");
-        mainMenuInstance();
+    gameInstance(realBoard);
 
-        exitGame(realBoard);
-    }
-    else
-    {
-
-        exitGame(realBoard);
-    }
+    return;
 }
 
 void inGameMenuInstance(Board *realBoard, int markedCount)
@@ -127,7 +123,6 @@ void gameInstance(Board *realBoard)
         //realBoard = setUpSampleBoard();
         char *difficultyMenu[] = {"Easy", "Normal", "Hard"};
         int choice = showMenu("Select a difficulty", difficultyMenu, 3, "Pick your option");
-        int width, height, mineCount;
         if (choice == 0)
         {
             realBoard = setUpBoard(realBoard, 10, 10, 10);
@@ -204,6 +199,7 @@ void gameInstance(Board *realBoard)
                         if (hasWon(*realBoard))
                         {
                             winScreen();
+
                             return;
                         }
                         else
@@ -228,6 +224,7 @@ void gameInstance(Board *realBoard)
                 if (hasWon(*realBoard))
                 {
                     winScreen();
+
                     return;
                 }
                 else
