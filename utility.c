@@ -45,6 +45,9 @@ bool checkForKey(int press, int key)
 
 void printBoard(Board tempBoard, int markedCount)
 {
+    /**TODO:
+     * Make different colors for each cell
+    */
     con_clear();
     for (int i = 0; i < tempBoard.sizeY; i++)
     {

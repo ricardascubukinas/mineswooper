@@ -106,6 +106,10 @@ char *selectLoadFile()
 
 void saveBoard(Board realBoard, char *fileName)
 {
+    /**TODO:
+     * Make a check for fopen
+    
+    */
     FILE *fw = fopen(fileName, "wb");
     fwrite(&realBoard, sizeof(Board), 1, fw);
     for (int i = 0; i < realBoard.sizeY; i++)
@@ -117,6 +121,9 @@ void saveBoard(Board realBoard, char *fileName)
 
 Board *loadBoard(char *fileName)
 {
+    /**TODO:
+     * Make a check for fopen
+    */
     Board *loadedBoard = malloc(sizeof(Board));
     FILE *fr = fopen(fileName, "rb");
 

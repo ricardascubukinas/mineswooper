@@ -6,6 +6,10 @@
  * 
 */
 
+/**TODO:
+ * Add more colors for different cell values
+*/
+
 #include "con_lib.h"
 
 // Bibliotekos realizacija. TOP SECRET
