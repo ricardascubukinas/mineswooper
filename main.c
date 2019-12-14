@@ -22,8 +22,10 @@
 
 int main()
 {
+    logStart();
+    atexit(logEnd);
     setUpVariables();
     mainMenuInstance();
 
-    exitGame(NULL);
+    return 0;
 }

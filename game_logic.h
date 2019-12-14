@@ -26,6 +26,5 @@ bool inBounds(int coordX, int coordY, int sizeX, int sizeY);
 bool hasWon(Board tempBoard);
 void loseScreen();
 void winScreen();
-void exitGame(Board *realBoard);
 
 #endif

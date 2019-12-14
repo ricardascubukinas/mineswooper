@@ -179,6 +179,7 @@ void gameInstance(Board *realBoard)
             {
                 if (!inGameMenuInstance(realBoard))
                 {
+                    freeUpVariables(realBoard);
 
                     return;
                 }
@@ -203,6 +204,7 @@ void gameInstance(Board *realBoard)
                     if (realBoard == NULL)
                     {
                         loseScreen();
+                        freeUpVariables(realBoard);
 
                         return;
                     }
@@ -211,6 +213,7 @@ void gameInstance(Board *realBoard)
                         if (hasWon(*realBoard))
                         {
                             winScreen();
+                            freeUpVariables(realBoard);
 
                             return;
                         }
@@ -236,6 +239,7 @@ void gameInstance(Board *realBoard)
                 if (hasWon(*realBoard))
                 {
                     winScreen();
+                    freeUpVariables(realBoard);
 
                     return;
                 }

@@ -206,13 +206,3 @@ void winScreen()
     system("pause");
     mainMenuInstance();
 }
-
-void exitGame(Board *realBoard)
-{
-    con_clear();
-    if (!realBoard)
-    {
-        free(realBoard);
-    }
-    exit(0);
-}

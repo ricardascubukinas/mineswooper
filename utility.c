@@ -10,6 +10,7 @@
 
 int areaX[9] = {0, -1, 0, 1, 1, 1, 0, -1, -1};
 int areaY[9] = {0, -1, -1, -1, 0, 1, 1, 1, 0};
+clock_t programStart;
 
 void setUpVariables()
 {
@@ -18,6 +19,17 @@ void setUpVariables()
     {
         wasPressed[i] = false;
     }
+}
+
+void freeUpVariables(Board *realBoard)
+{
+    con_clear();
+    if (!realBoard)
+    {
+        free(realBoard);
+    }
+
+    return;
 }
 
 int randInt(int low, int high)
@@ -79,4 +91,41 @@ void printBoard(Board tempBoard)
     fflush(stdout);
 
     return;
+}
+
+void logStart()
+{
+    programStart = clock();
+    FILE *fw = fopen("log.txt", "a");
+    if (fw != NULL)
+    {
+        time_t t;
+        time(&t);
+        fprintf(fw, "The program has started, current date and time: %s", ctime(&t));
+
+        fclose(fw);
+    }
+    else
+    {
+        printf("Failed to log to file\n");
+        system("pause");
+    }
+}
+
+void logEnd()
+{
+    clock_t programEnd = clock();
+    double executeTime = (double)(programEnd - programStart) / CLOCKS_PER_SEC;
+    FILE *fw = fopen("log.txt", "a");
+    if (fw != NULL)
+    {
+        fprintf(fw, "The execute time was: %lf", executeTime);
+
+        fclose(fw);
+    }
+    else
+    {
+        printf("Failed to log to file\n");
+        system("pause");
+    }
 }
