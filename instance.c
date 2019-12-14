@@ -126,7 +126,6 @@ void inGameMenuInstance(Board *realBoard, int markedCount)
 
 void gameInstance(Board *realBoard)
 {
-    //TODO potato
     if (realBoard == NULL)
     {
         //realBoard = setUpSampleBoard();

@@ -121,27 +121,30 @@ void saveBoard(Board realBoard, char *fileName)
 
 Board *loadBoard(char *fileName)
 {
-    /**TODO:
-     * Make a check for fopen
-    */
     Board *loadedBoard = malloc(sizeof(Board));
     FILE *fr = fopen(fileName, "rb");
-
-    if (fread(loadedBoard, sizeof(Board), 1, fr) == 1) // True statement
+    if (fr != NULL)
     {
-        //Cell **temp = (Cell **)malloc(loadedBoard->sizeY * sizeof(Cell *));
-        loadedBoard->cells = (Cell **)malloc(loadedBoard->sizeY * sizeof(Cell *));
-        for (int i = 0; i < loadedBoard->sizeY; i++)
+        if (fread(loadedBoard, sizeof(Board), 1, fr) == 1) // True statement
         {
-            loadedBoard->cells[i] = (Cell *)malloc(loadedBoard->sizeX * sizeof(Cell));
-            fread(loadedBoard->cells[i], sizeof(Cell), loadedBoard->sizeX, fr);
+            //Cell **temp = (Cell **)malloc(loadedBoard->sizeY * sizeof(Cell *));
+            loadedBoard->cells = (Cell **)malloc(loadedBoard->sizeY * sizeof(Cell *));
+            for (int i = 0; i < loadedBoard->sizeY; i++)
+            {
+                loadedBoard->cells[i] = (Cell *)malloc(loadedBoard->sizeX * sizeof(Cell));
+                fread(loadedBoard->cells[i], sizeof(Cell), loadedBoard->sizeX, fr);
+            }
+            fclose(fr);
+            return loadedBoard;
         }
-        fclose(fr);
-        return loadedBoard;
+        else
+        {
+            fclose(fr);
+            return NULL;
+        }
     }
     else
     {
-        fclose(fr);
         return NULL;
     }
 }
