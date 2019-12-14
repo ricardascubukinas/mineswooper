@@ -17,8 +17,8 @@
 #include "con_lib.h"
 #include "save.h"
 
-int areaX[9];
-int areaY[9];
+const int areaX[9];
+const int areaY[9];
 clock_t programStart;
 
 void setUpVariables();

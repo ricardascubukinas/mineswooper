@@ -8,8 +8,8 @@
 
 #include "utility.h"
 
-int areaX[9] = {0, -1, 0, 1, 1, 1, 0, -1, -1};
-int areaY[9] = {0, -1, -1, -1, 0, 1, 1, 1, 0};
+const int areaX[9] = {0, -1, 0, 1, 1, 1, 0, -1, -1};
+const int areaY[9] = {0, -1, -1, -1, 0, 1, 1, 1, 0};
 clock_t programStart;
 
 void setUpVariables()
