@@ -97,7 +97,7 @@ void mainMenuInstance()
     return;
 }
 
-void inGameMenuInstance(Board *realBoard)
+bool inGameMenuInstance(Board *realBoard)
 {
     char *gameMenu[4] = {"Save", "Go back", "Quit to main menu", "Quit game"};
     int choice = showMenu("In game menu", gameMenu, 4, "Pick your option");
@@ -106,22 +106,25 @@ void inGameMenuInstance(Board *realBoard)
         saveBoard(*realBoard, selectSaveFile());
         system("pause");
         printBoard(*realBoard);
+
+        return true;
     }
     else if (choice == 1)
     {
         printBoard(*realBoard);
+
+        return true;
     }
     else if (choice == 2)
     {
         mainMenuInstance();
-        exitGame(realBoard);
+
+        return false;
     }
     else
     {
-        exitGame(realBoard);
+        return false;
     }
-
-    return;
 }
 
 void gameInstance(Board *realBoard)
@@ -174,7 +177,11 @@ void gameInstance(Board *realBoard)
             }
             if (checkForKey(key, 'm'))
             {
-                inGameMenuInstance(realBoard);
+                if (!inGameMenuInstance(realBoard))
+                {
+
+                    return;
+                }
             }
             if (posY > realBoard->sizeY - 1)
                 posY = 0;
@@ -196,6 +203,7 @@ void gameInstance(Board *realBoard)
                     if (realBoard == NULL)
                     {
                         loseScreen();
+
                         return;
                     }
                     else

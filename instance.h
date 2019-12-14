@@ -23,7 +23,7 @@
 bool wasPressed[128];
 int showMenu(char *menuTitle, char *menuOptions[], int menuSize, char *inputMsg);
 void mainMenuInstance();
-void inGameMenuInstance(Board *realBoard);
+bool inGameMenuInstance(Board *realBoard);
 void gameInstance(Board *realBoard);
 void scoreboardInstance();
 
