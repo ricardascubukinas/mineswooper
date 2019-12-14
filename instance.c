@@ -97,7 +97,7 @@ void mainMenuInstance()
     return;
 }
 
-void inGameMenuInstance(Board *realBoard, int markedCount)
+void inGameMenuInstance(Board *realBoard)
 {
     char *gameMenu[4] = {"Save", "Go back", "Quit to main menu", "Quit game"};
     int choice = showMenu("In game menu", gameMenu, 4, "Pick your option");
@@ -105,11 +105,11 @@ void inGameMenuInstance(Board *realBoard, int markedCount)
     {
         saveBoard(*realBoard, selectSaveFile());
         system("pause");
-        printBoard(*realBoard, markedCount);
+        printBoard(*realBoard);
     }
     else if (choice == 1)
     {
-        printBoard(*realBoard, markedCount);
+        printBoard(*realBoard);
     }
     else if (choice == 2)
     {
@@ -146,8 +146,8 @@ void gameInstance(Board *realBoard)
         //saveBoard(*realBoard, "save.bin");
         //realBoard = loadBoard("save.bin");
     }
-    int posX = 2, posY = 0, markedCount = 0;
-    printBoard(*realBoard, markedCount);
+    int posX = realBoard->cursorX * 3 + 2, posY = realBoard->cursorY;
+    printBoard(*realBoard);
 
     while (1)
     {
@@ -174,7 +174,7 @@ void gameInstance(Board *realBoard)
             }
             if (checkForKey(key, 'm'))
             {
-                inGameMenuInstance(realBoard, markedCount);
+                inGameMenuInstance(realBoard);
             }
             if (posY > realBoard->sizeY - 1)
                 posY = 0;
@@ -208,7 +208,7 @@ void gameInstance(Board *realBoard)
                         }
                         else
                         {
-                            printBoard(*realBoard, markedCount);
+                            printBoard(*realBoard);
                         }
                     }
                 }
@@ -218,12 +218,12 @@ void gameInstance(Board *realBoard)
                 if (realBoard->cells[realBoard->cursorY][realBoard->cursorX].isMarked)
                 {
                     realBoard->cells[realBoard->cursorY][realBoard->cursorX].isMarked = false;
-                    markedCount--;
+                    realBoard->markedCount--;
                 }
-                else if (!realBoard->cells[realBoard->cursorY][realBoard->cursorX].isMarked && markedCount < realBoard->mineCount)
+                else if (!realBoard->cells[realBoard->cursorY][realBoard->cursorX].isMarked && realBoard->markedCount < realBoard->mineCount)
                 {
                     realBoard->cells[realBoard->cursorY][realBoard->cursorX].isMarked = true;
-                    markedCount++;
+                    realBoard->markedCount++;
                 }
                 if (hasWon(*realBoard))
                 {
@@ -233,7 +233,7 @@ void gameInstance(Board *realBoard)
                 }
                 else
                 {
-                    printBoard(*realBoard, markedCount);
+                    printBoard(*realBoard);
                 }
             }
 

@@ -5,7 +5,7 @@
 
 typedef struct Board
 {
-    int mineCount;
+    int mineCount, markedCount;
     int sizeX, sizeY;
     int cursorX, cursorY;
     Cell **cells;

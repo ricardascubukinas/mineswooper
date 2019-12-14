@@ -11,6 +11,7 @@
 Board *setUpBoard(Board *realBoard, int height, int width, int mines)
 {
     realBoard = malloc(sizeof(Board));
+    realBoard->markedCount = 0;
     realBoard->mineCount = mines;
     realBoard->sizeX = width;
     realBoard->sizeY = height;

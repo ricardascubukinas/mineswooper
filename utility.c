@@ -43,7 +43,7 @@ bool checkForKey(int press, int key)
     return false;
 }
 
-void printBoard(Board tempBoard, int markedCount)
+void printBoard(Board tempBoard)
 {
     /**TODO:
      * Make different colors for each cell
@@ -70,9 +70,13 @@ void printBoard(Board tempBoard, int markedCount)
         }
         printf("\n");
     }
-    printf("  Mines left: %i\n", tempBoard.mineCount - markedCount);
+    printf("  Mines left: %i\n", tempBoard.mineCount - tempBoard.markedCount);
     printf("  Controls: w - up, s - down, a - left, d - right\n");
     printf("  ENTER - reveal a cell, SPACE - mark a cell, m - open menu\n");
+
+    con_set_color(COLOR_BLACK, COLOR_GRAY);
+    con_set_pos(tempBoard.cursorX * 3 + 2, tempBoard.cursorY);
+    fflush(stdout);
 
     return;
 }

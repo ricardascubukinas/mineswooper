@@ -23,6 +23,6 @@ int areaY[9];
 void setUpVariables();
 int randInt(int low, int high);
 bool checkForKey(int press, int key);
-void printBoard(Board tempBoard, int markedCount);
+void printBoard(Board tempBoard);
 
 #endif
