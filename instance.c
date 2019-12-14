@@ -172,10 +172,6 @@ void gameInstance(Board *realBoard)
             {
                 posX += 3;
             }
-            if (checkForKey(key, 'q'))
-            {
-                return;
-            }
             if (checkForKey(key, 'm'))
             {
                 inGameMenuInstance(realBoard, markedCount);
