@@ -14,7 +14,25 @@ clock_t programStart;
 
 void setUpVariables()
 {
+    FILE *setUp = fopen("count.txt", "r");
+    if (!setUp)
+    {
+        fclose(setUp);
+        setUp = fopen("count.txt", "w");
+        fprintf(setUp, "%i", 0);
+    }
+    fclose(setUp);
+
+    setUp = fopen("scoreboard.txt", "r");
+    if (!setUp)
+    {
+        fclose(setUp);
+        setUp = fopen("scoreboard.txt", "w");
+    }
+    fclose(setUp);
+
     srand(time(NULL));
+
     for (int i = 0; i < 128; i++)
     {
         wasPressed[i] = false;

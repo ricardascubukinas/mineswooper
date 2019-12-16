@@ -18,23 +18,30 @@ void saveToScoreboard(Player save)
 void viewScoreboard()
 {
     int count = getCount();
-
-    FILE *fr = fopen("scoreboard.txt", "r");
-
-    Player *scoreboard = malloc(sizeof(Player) * count);
-    for (int i = 0; i < count; i++)
+    if (count > 0)
     {
-        scoreboard[i].name = malloc(sizeof(char) * NAME_MAX);
-        fscanf(fr, "%s %i", scoreboard[i].name, &scoreboard[i].time);
+        FILE *fr = fopen("scoreboard.txt", "r");
+        Player *scoreboard;
+        if (fr != NULL)
+        {
+            scoreboard = malloc(sizeof(Player) * count);
+            for (int i = 0; i < count; i++)
+            {
+                scoreboard[i].name = malloc(sizeof(char) * NAME_MAX);
+                fscanf(fr, "%s %i", scoreboard[i].name, &scoreboard[i].time);
+            }
+            scoreboard = sortScoreboard(scoreboard, count);
+        }
+        fclose(fr);
+
+        printf("%14sScoreboard\n\n", " ");
+        printf("   %23s %7s\n", "Vardas", "Laikas");
+        for (int i = 0; i < SHOW_TOP && i < count; i++)
+        {
+            printf("%4i. %20s %7i\n", i + 1, scoreboard[i].name, scoreboard[i].time);
+        }
     }
-    scoreboard = sortScoreboard(scoreboard, count);
-    fclose(fr);
-    printf("%14sScoreboard\n\n", " ");
-    printf("   %23s %7s\n", "Vardas", "Laikas");
-    for (int i = 0; i < SHOW_TOP; i++)
-    {
-        printf("%4i. %20s %7i\n", i + 1, scoreboard[i].name, scoreboard[i].time);
-    }
+
     system("pause");
 
     return;
