@@ -85,12 +85,21 @@ void printBoard(Board tempBoard)
     printf("  Mines left: %i\n", tempBoard.mineCount - tempBoard.markedCount);
     printf("  Controls: w - up, s - down, a - left, d - right\n");
     printf("  ENTER - reveal a cell, SPACE - mark a cell, m - open menu\n");
-
     con_set_color(COLOR_BLACK, COLOR_GRAY);
     con_set_pos(tempBoard.cursorX * 3 + 2, tempBoard.cursorY);
     fflush(stdout);
+    printTime(tempBoard);
 
     return;
+}
+
+void printTime(Board tempBoard)
+{
+    con_set_pos(0, tempBoard.sizeY + 3);
+    printf("  Time passed: %i\n", tempBoard.timeSeconds);
+    con_set_pos(tempBoard.cursorX * 3 + 2, tempBoard.cursorY);
+    con_set_color(COLOR_BLACK, COLOR_GRAY);
+    fflush(stdout);
 }
 
 void logStart()
@@ -119,7 +128,7 @@ void logEnd()
     FILE *fw = fopen("log.txt", "a");
     if (fw != NULL)
     {
-        fprintf(fw, "The execute time was: %lf", executeTime);
+        fprintf(fw, "The execute time was: %lf\n", executeTime);
 
         fclose(fw);
     }

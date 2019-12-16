@@ -11,6 +11,7 @@
 Board *setUpBoard(Board *realBoard, int height, int width, int mines)
 {
     realBoard = malloc(sizeof(Board));
+    realBoard->timeSeconds = 0;
     realBoard->markedCount = 0;
     realBoard->mineCount = mines;
     realBoard->sizeX = width;
@@ -204,5 +205,15 @@ void winScreen()
     con_clear();
     printf("You've won\n");
     system("pause");
+    char *save[2] = {"Yes", "No"};
+    int choice = showMenu("Do you want to save your win to scoreboard", save, 2, "Pick your option");
+    if (choice == 0)
+    {
+
+    }
+    else
+    {
+        
+    }
     mainMenuInstance();
 }

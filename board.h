@@ -5,6 +5,7 @@
 
 typedef struct Board
 {
+    int timeSeconds;
     int mineCount, markedCount;
     int sizeX, sizeY;
     int cursorX, cursorY;

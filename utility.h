@@ -28,5 +28,6 @@ bool checkForKey(int press, int key);
 void printBoard(Board tempBoard);
 void logStart();
 void logEnd();
+void printTime(Board tempBoard);
 
 #endif

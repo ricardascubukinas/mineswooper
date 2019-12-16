@@ -84,8 +84,6 @@ void mainMenuInstance()
         else if (choice == 2)
         {
             scoreboardInstance();
-            char *menuScoreboard[1] = {"Go back"};
-            showMenu("Welcome to the scoreboard", menuScoreboard, 1, "Pick what you want to do");
         }
         else
         {
@@ -129,11 +127,12 @@ bool inGameMenuInstance(Board *realBoard)
 
 void gameInstance(Board *realBoard)
 {
+    int choice;
     if (realBoard == NULL)
     {
         //realBoard = setUpSampleBoard();
         char *difficultyMenu[] = {"Easy", "Normal", "Hard"};
-        int choice = showMenu("Select a difficulty", difficultyMenu, 3, "Pick your option");
+        choice = showMenu("Select a difficulty", difficultyMenu, 3, "Pick your option");
         if (choice == 0)
         {
             realBoard = setUpBoard(realBoard, 10, 10, 10);
@@ -151,7 +150,8 @@ void gameInstance(Board *realBoard)
     }
     int posX = realBoard->cursorX * 3 + 2, posY = realBoard->cursorY;
     printBoard(*realBoard);
-
+    clock_t gameStart = clock();
+    int oldTime = 0;
     while (1)
     {
         int key = 0;
@@ -183,11 +183,16 @@ void gameInstance(Board *realBoard)
 
                     return;
                 }
+                //gameStart = clock() + realBoard->timeSeconds;
             }
             if (posY > realBoard->sizeY - 1)
+            {
                 posY = 0;
+            }
             if (posY < 0)
+            {
                 posY = realBoard->sizeY - 1;
+            }
 
             if (posX < 2)
                 posX = (realBoard->sizeX * 3) - 1;
@@ -248,19 +253,18 @@ void gameInstance(Board *realBoard)
                     printBoard(*realBoard);
                 }
             }
-
             con_set_color(COLOR_BLACK, COLOR_GRAY);
             con_set_pos(posX, posY);
             fflush(stdout);
         }
+        if ((int)(clock() - gameStart) / CLOCKS_PER_SEC > 0)
+        {
+            gameStart = clock();
+            oldTime = realBoard->timeSeconds;
+            realBoard->timeSeconds++;
+            printTime(*realBoard);
+        }
     }
-
-    return;
-}
-
-void scoreboardInstance()
-{
-    /* Not implemented yet */
 
     return;
 }

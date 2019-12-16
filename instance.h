@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 
 #include "board.h"
 #include "game_logic.h"
@@ -19,12 +20,12 @@
 #include "save.h"
 #include "utility.h"
 #include "instance.h"
+#include "scoreboard.h"
 
 bool wasPressed[128];
 int showMenu(char *menuTitle, char *menuOptions[], int menuSize, char *inputMsg);
 void mainMenuInstance();
 bool inGameMenuInstance(Board *realBoard);
 void gameInstance(Board *realBoard);
-void scoreboardInstance();
 
 #endif
