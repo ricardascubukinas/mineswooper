@@ -200,7 +200,7 @@ void loseScreen()
     mainMenuInstance();
 }
 
-void winScreen()
+void winScreen(int time)
 {
     con_clear();
     printf("You've won\n");
@@ -209,11 +209,31 @@ void winScreen()
     int choice = showMenu("Do you want to save your win to scoreboard", save, 2, "Pick your option");
     if (choice == 0)
     {
-
-    }
-    else
-    {
-        
+        Player save;
+        save.time = time;
+        while (1)
+        {
+            char *temp = malloc(sizeof(char) * FILENAME_MAX);
+            printf("Enter a name to be shown in scoreboard:\n");
+            fgets(temp, FILENAME_MAX, stdin);
+            strtok(temp, "\n");
+            if (strlen(temp) > NAME_MAX)
+            {
+                printf("Error! File's name length is too long.\n");
+            }
+            else if (temp == NULL || temp[0] == '\n' || temp[0] == '\0')
+            {
+                printf("You can't enter an empty string\n");
+            }
+            else
+            {
+                save.name = temp;
+                break;
+            }
+        }
+        saveToScoreboard(save);
     }
     mainMenuInstance();
+
+    return;
 }

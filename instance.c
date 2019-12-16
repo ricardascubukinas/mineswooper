@@ -83,7 +83,7 @@ void mainMenuInstance()
         }
         else if (choice == 2)
         {
-            scoreboardInstance();
+            viewScoreboard();
         }
         else
         {
@@ -183,7 +183,6 @@ void gameInstance(Board *realBoard)
 
                     return;
                 }
-                //gameStart = clock() + realBoard->timeSeconds;
             }
             if (posY > realBoard->sizeY - 1)
             {
@@ -217,7 +216,7 @@ void gameInstance(Board *realBoard)
                     {
                         if (hasWon(*realBoard))
                         {
-                            winScreen();
+                            winScreen(realBoard->timeSeconds);
                             freeUpVariables(realBoard);
 
                             return;
@@ -243,7 +242,7 @@ void gameInstance(Board *realBoard)
                 }
                 if (hasWon(*realBoard))
                 {
-                    winScreen();
+                    winScreen(realBoard->timeSeconds);
                     freeUpVariables(realBoard);
 
                     return;

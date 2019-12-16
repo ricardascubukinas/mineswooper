@@ -16,6 +16,7 @@
 #include "board.h"
 #include "utility.h"
 #include "instance.h"
+#include "player.h"
 
 Board *setUpBoard(Board *realBoard, int height, int width, int mines);
 Board *reveal(Board *tempBoard, bool isFirst);
@@ -25,6 +26,6 @@ int countNearbyMines(Board tempBoard, int coordX, int coordY);
 bool inBounds(int coordX, int coordY, int sizeX, int sizeY);
 bool hasWon(Board tempBoard);
 void loseScreen();
-void winScreen();
+void winScreen(int time);
 
 #endif

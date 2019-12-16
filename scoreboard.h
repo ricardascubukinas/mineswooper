@@ -2,8 +2,13 @@
 #define SCOREBOARD_H
 
 #include "instance.h"
+#include "player.h"
 
-void scoreboardInstance();
+#define NAME_MAX 20
+#define SHOW_TOP 10
+
+void saveToScoreboard(Player save);
 void viewScoreboard();
+int getCount();
 
 #endif

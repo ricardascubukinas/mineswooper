@@ -138,3 +138,47 @@ void logEnd()
         system("pause");
     }
 }
+
+Player *sortScoreboard(Player *scoreboard, int size)
+{
+
+    for (int i = 0; i < size - 1; i++)
+    {
+        bool isSwapped = false;
+
+        for (int j = 0; j < size - i - 1; j++)
+        {
+            if (scoreboard[j].time > scoreboard[j + 1].time)
+            {
+                swap(&scoreboard[j], &scoreboard[j + 1]);
+                isSwapped = true;
+            }
+        }
+        if (!isSwapped)
+        {
+            break;
+        }
+    }
+
+    return scoreboard;
+}
+
+void swap(Player *a, Player *b)
+{
+    Player temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+void testFunctions()
+{
+    assert(inBounds(-5, -10, 5, 10) == false);
+    FILE *fr = fopen("count.txt", "r");
+    int count;
+    fscanf(fr, "%d", &count);
+    assert(count == getCount());
+    assert(randInt(1, 10) >= 1);
+    assert(randInt(1, 10) <= 10);
+
+    return;
+}
