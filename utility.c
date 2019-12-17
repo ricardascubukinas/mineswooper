@@ -190,6 +190,9 @@ void swap(Player *a, Player *b)
 
 void testFunctions()
 {
+    /**TODO:
+     * Atskira programa testeris
+    */
     assert(inBounds(-5, -10, 5, 10) == false);
     FILE *fr = fopen("count.txt", "r");
     int count;

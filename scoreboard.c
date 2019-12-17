@@ -3,13 +3,21 @@
 void saveToScoreboard(Player save)
 {
     FILE *fr = fopen("scoreboard.txt", "a");
-    fprintf(fr, "%s %i\n", save.name, save.time);
+    if (fr != NULL)
+    {
+        fprintf(fr, "%s %i\n", save.name, save.time);
+    }
+
     fclose(fr);
 
     int count = getCount() + 1;
 
     fr = fopen("count.txt", "w");
-    fprintf(fr, "%i", count);
+    if (fr != NULL)
+    {
+        fprintf(fr, "%i", count);
+    }
+
     fclose(fr);
 
     return;
@@ -51,7 +59,10 @@ int getCount()
 {
     int count = 0;
     FILE *fr = fopen("count.txt", "r");
-    fscanf(fr, "%i", &count);
+    if (fr != NULL)
+    {
+        fscanf(fr, "%i", &count);
+    }
     fclose(fr);
 
     return count;
