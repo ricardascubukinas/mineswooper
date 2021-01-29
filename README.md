@@ -1,7 +1,7 @@
 # Mineswooper
 A simple terminal minesweeper implementation in C
 
-![Gameplay](../img/example-game.png)
+![Gameplay](img/example-game.png)
 
 ## Building
 
