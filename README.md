@@ -12,7 +12,7 @@ Requirements:
 - A terminal?
 
 ```
-$ git clone	https://github.com/ricardascubukinas/mineswooper.git
+$ git clone https://github.com/ricardascubukinas/mineswooper.git
 $ cd mineswooper/src
 $ make
 $ ./game.exe
