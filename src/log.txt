@@ -1,0 +1,8 @@
+The program has started, current date and time: Fri Jan 29 23:20:46 2021
+The execute time was: 1.945000
+The program has started, current date and time: Fri Jan 29 23:27:20 2021
+The execute time was: 17.248000
+The program has started, current date and time: Fri Jan 29 23:28:03 2021
+The execute time was: 1.790000
+The program has started, current date and time: Fri Jan 29 23:31:07 2021
+The execute time was: 545.425000
